@@ -1,0 +1,5 @@
+<!--miniprogram/pages/scenicDistrict/index.wxml-->
+<scroll-view scroll-x="true" scroll-y="true">
+  <canvas canvas-id="ssdwCanvas" style="width: 1555px; height: 1200px;">
+  </canvas>
+</scroll-view>
