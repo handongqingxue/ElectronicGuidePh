@@ -1,5 +1,5 @@
 <!--miniprogram/pages/scenicDistrict/index.wxml-->
-<scroll-view scroll-x="true" scroll-y="true">
-  <canvas canvas-id="ssdwCanvas" style="width: 1555px; height: 1200px;">
+<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;">
+  <canvas canvas-id="sceDisCanvas" style="width: {{sceDis.mapWidth}}px; height: {{sceDis.mapHeight}}px;">
   </canvas>
 </scroll-view>
