@@ -3,3 +3,16 @@
   <canvas canvas-id="sceDisCanvas" style="width: {{sceDis.mapWidth}}px; height: {{sceDis.mapHeight}}px;">
   </canvas>
 </scroll-view>
+<view class="dhdy_view">
+  <view class="dhdy_but_view" style="background-image: url('/images/001.png');">
+    <view class="lr_but_view dh_but_view">
+      <image src="/images/002.png"></image>
+      <view>导航</view>
+    </view>
+    <image class="lx_but_img" src="/images/003.png"></image>
+    <view class="lr_but_view dy_but_view">
+      <image src="/images/004.png"></image>
+      <view>导游</view>
+    </view>
+  </view>
+</view>

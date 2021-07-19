@@ -18,12 +18,13 @@ Page({
     let sceDisId=options.sceDisId;
     //wx.setStorageSync('sceDisId', sceDisId);
     wx.setStorageSync('sceDisId', 1);
+  },
+  getWindowSize:function(){
     scenicDistrict.setData({
       windowWidth:wx.getSystemInfoSync().windowWidth,
       windowHeight:wx.getSystemInfoSync().windowHeight
     });
   },
-
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -97,7 +98,6 @@ Page({
 
   },
   selectSceDisById:function(){
-    scenicDistrict.getImageInfo("sceDisCanvas","http://www.qrcodesy.com:8080/ElectronicGuide/upload/map/1626254021278.jpg");
     let sceDisId=wx.getStorageSync('sceDisId');
     wx.request({
       url: serverPathCQ+"selectSceDisById",
@@ -114,6 +114,7 @@ Page({
           scenicDistrict.setData({
             sceDis:data.sceDis
           });
+          scenicDistrict.getImageInfo("sceDisCanvas","http://www.qrcodesy.com:8080"+data.sceDis.mapUrl);
         }
       }
     })
