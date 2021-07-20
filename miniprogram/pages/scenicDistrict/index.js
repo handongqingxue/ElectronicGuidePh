@@ -1,12 +1,15 @@
 // miniprogram/pages/scenicDistrict/index.js
 var scenicDistrict;
 var serverPathCQ;
+var serverPath;
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
+    sceDisCanvasImageX:0,
+    sceDisCanvasImageY:0
   },
 
   /**
@@ -15,6 +18,7 @@ Page({
   onLoad: function (options) {
     scenicDistrict=this;
     serverPathCQ=getApp().getServerPathCQ();
+    serverPath=getApp().getServerPath();
     let sceDisId=options.sceDisId;
     //wx.setStorageSync('sceDisId', sceDisId);
     wx.setStorageSync('sceDisId', 1);
@@ -111,10 +115,22 @@ Page({
         console.log(data);
         var status = res.data.status;
         if (status == "ok") {
+          let sceDis=data.sceDis;
+          let sceDisCanvasMinWidth=sceDis.mapWidth;
+          let sceDisCanvasMinHeight=sceDis.mapHeight;
+          let sceDisCanvasMaxWidth=sceDis.picWidth;
+          let sceDisCanvasMaxHeight=sceDis.picHeight;
           scenicDistrict.setData({
-            sceDis:data.sceDis
+            sceDis:sceDis,
+            sceDisCanvasMinWidth:sceDisCanvasMinWidth,
+            sceDisCanvasMinHeight:sceDisCanvasMinHeight,
+            sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
+            sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
+            sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
+            sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
           });
-          scenicDistrict.getImageInfo("sceDisCanvas","http://www.qrcodesy.com:8080"+data.sceDis.mapUrl);
+          
+          scenicDistrict.getImageInfo("sceDisCanvas",serverPath+data.sceDis.mapUrl);
         }
       }
     })
@@ -125,16 +141,79 @@ Page({
       success: function (res){
         switch(flag){
           case "sceDisCanvas":
-            scenicDistrict.initSceDisCanvas(res.path);
+            scenicDistrict.setData({sceDisCanvasImagePath:res.path})
+            scenicDistrict.initSceDisCanvas(res.path,false);
             break;
         }
       }
     })
   },
-  initSceDisCanvas:function(path){
+  initSceDisCanvas:function(path,reSizeFlag){
+    let scenicDistrictData=scenicDistrict.data;
+    //let sceDis=scenicDistrictData.sceDis;
+    let sceDisCanvasImageX=scenicDistrictData.sceDisCanvasImageX;
+    let sceDisCanvasImageY=scenicDistrictData.sceDisCanvasImageY;
+    let sceDisCanvasStyleWidth=scenicDistrictData.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=scenicDistrictData.sceDisCanvasStyleHeight;
+    let sceDisCanvas=null;
+    if(reSizeFlag){
+      scenicDistrict.clearSceDisCanvas();
+      sceDisCanvas=scenicDistrict.data.sceDisCanvas;
+    }
+    else{
+      sceDisCanvas = wx.createCanvasContext('sceDisCanvas')
+      scenicDistrict.setData({sceDisCanvas:sceDisCanvas});
+    }
+    sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
+    sceDisCanvas.draw();
+  },
+  changeCanvasSize:function(e){
+    let bigflag=e.currentTarget.dataset.bigflag;
+    let resetflag=e.currentTarget.dataset.resetflag;
+    let scenicDistrictData=scenicDistrict.data;
+    let sceDisCanvasStyleWidth=scenicDistrictData.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=scenicDistrictData.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=scenicDistrictData.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicDistrictData.sceDisCanvasMinHeight;
+    let sceDisCanvasMaxWidth=scenicDistrictData.sceDisCanvasMaxWidth;
+    let sceDisCanvasMaxHeight=scenicDistrictData.sceDisCanvasMaxHeight;
+    //var mcw=sceDisCanvasStyleWidth;
+	  //var mch=sceDisCanvasStyleHeight;
+    if(resetflag){
+      sceDisCanvasStyleWidth=sceDisCanvasMinWidth;
+    }
+    else{
+      if(bigflag==1)
+        sceDisCanvasStyleWidth+=sceDisCanvasMinWidth*0.2;
+      else
+        sceDisCanvasStyleWidth-=sceDisCanvasMinWidth*0.2;
+    }
+	
+    if(sceDisCanvasStyleWidth<sceDisCanvasMinWidth){
+      sceDisCanvasStyleWidth=sceDisCanvasMinWidth;
+    }
+    else if(sceDisCanvasStyleWidth>sceDisCanvasMaxWidth){
+      sceDisCanvasStyleWidth=sceDisCanvasMaxWidth;
+    }
+  
+    if(sceDisCanvasStyleHeight<sceDisCanvasMinHeight){
+      sceDisCanvasStyleHeight=sceDisCanvasMinHeight;
+    }
+    else if(sceDisCanvasStyleHeight>sceDisCanvasMaxHeight){
+      sceDisCanvasStyleHeight=sceDisCanvasMaxHeight;
+    }
+    sceDisCanvasStyleHeight=sceDisCanvasStyleWidth*sceDisCanvasMinHeight/sceDisCanvasMinWidth;
+
+    scenicDistrict.setData({
+      sceDisCanvasStyleWidth:sceDisCanvasStyleWidth,
+      sceDisCanvasStyleHeight:sceDisCanvasStyleHeight
+    })
+    scenicDistrict.initSceDisCanvas(scenicDistrict.data.sceDisCanvasImagePath,true);
+  },
+  clearSceDisCanvas:function(){
     let sceDis=scenicDistrict.data.sceDis;
-    var ctx = wx.createCanvasContext('sceDisCanvas')
-    ctx.drawImage(path, 0, 0, sceDis.mapWidth, sceDis.mapHeight);
-    ctx.draw();
+    let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
+    sceDisCanvas.clearRect(0, 0, sceDis.mapWidth, sceDis.mapHeight);
+    sceDisCanvas.draw(true);
   }
 })

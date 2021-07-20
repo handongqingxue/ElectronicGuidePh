@@ -1,6 +1,7 @@
 //app.js
 //var serverPathCQ = "http://www.qrcodesy.com:8080/ElectronicGuideCQ/wechatApplet/";
 var serverPathCQ = "http://192.168.2.166:8080/ElectronicGuideCQ/wechatApplet/";
+var serverPath = "http://www.qrcodesy.com:8080";
 
 App({
   onLaunch: function () {
@@ -21,5 +22,8 @@ App({
   },
   getServerPathCQ:function(){
     return serverPathCQ;
+  },
+  getServerPath:function(){
+    return serverPath;
   }
 })

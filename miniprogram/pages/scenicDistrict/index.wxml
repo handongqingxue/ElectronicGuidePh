@@ -1,8 +1,15 @@
 <!--miniprogram/pages/scenicDistrict/index.wxml-->
 <scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;">
-  <canvas canvas-id="sceDisCanvas" style="width: {{sceDis.mapWidth}}px; height: {{sceDis.mapHeight}}px;">
+  <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;">
   </canvas>
 </scroll-view>
+<view class="scale_set_view">
+	<view class="but_view reset_but_view" catchtap="changeCanvasSize(null,true)">
+		<image alt="" src="/images/005.png"></image>
+	</view>
+	<view class="but_view big_but_view" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</view>
+	<view class="but_view small_but_view" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</view>
+</view>
 <view class="dhdy_view">
   <view class="dhdy_but_view" style="background-image: url('/images/001.png');">
     <view class="lr_but_view dh_but_view">
