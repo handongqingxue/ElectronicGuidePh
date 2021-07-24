@@ -1,4 +1,5 @@
 // miniprogram/pages/scenicDistrict/index.js
+//https://blog.csdn.net/qq_19741181/article/details/104505264
 var scenicDistrict;
 var serverPathCQ;
 var serverPath;
@@ -130,10 +131,30 @@ Page({
             sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
           });
           
+          //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
+          //https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg
           scenicDistrict.getImageInfo("sceDisCanvas",serverPath+data.sceDis.mapUrl);
+          //scenicDistrict.getImageInfo("sceDisCanvas","https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
         }
+      },
+      fail:function(res){
+        getApp().showToast(serverPathCQ);
+        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
+        //scenicDistrict.downloadFile("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
+        //scenicDistrict.getImageInfo("sceDisCanvas","https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
       }
     })
+  },
+  downloadFile:function(src){
+    wx.downloadFile({
+      url:src,
+      success:function(res){
+        console.log(JSON.stringify(res))
+      },
+      fail:function(res){
+        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
+      }
+    });
   },
   getImageInfo:function(flag,src){
     wx.getImageInfo({
@@ -145,6 +166,9 @@ Page({
             scenicDistrict.initSceDisCanvas(res.path,false);
             break;
         }
+      },
+      fail: function(res){
+        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
       }
     })
   },

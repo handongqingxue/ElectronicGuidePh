@@ -4,7 +4,7 @@
   </canvas>
 </scroll-view>
 <view class="scale_set_view">
-	<view class="but_view reset_but_view" catchtap="changeCanvasSize(null,true)">
+	<view class="but_view reset_but_view" data-bigflag="{{null}}" data-resetflag="{{true}}" catchtap="changeCanvasSize">
 		<image alt="" src="/images/005.png"></image>
 	</view>
 	<view class="but_view big_but_view" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</view>
@@ -22,4 +22,5 @@
       <view>导游</view>
     </view>
   </view>
+  <view>{{toastMsg}}</view>
 </view>
