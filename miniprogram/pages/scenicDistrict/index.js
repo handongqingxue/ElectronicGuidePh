@@ -10,19 +10,31 @@ Page({
    */
   data: {
     sceDisCanvasImageX:0,
-    sceDisCanvasImageY:0
+    sceDisCanvasImageY:0,
+    dhdyButBgImg:'/images/001.png'
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+
     scenicDistrict=this;
     serverPathCQ=getApp().getServerPathCQ();
     serverPath=getApp().getServerPath();
     let sceDisId=options.sceDisId;
     //wx.setStorageSync('sceDisId', sceDisId);
     wx.setStorageSync('sceDisId', 1);
+    scenicDistrict.getWindowSize();
+    scenicDistrict.initBackgroundImage(this.data.dhdyButBgImg);
+  },
+  initBackgroundImage:function(name){
+    let base64 = wx.getFileSystemManager().readFileSync(name, 'base64');
+    if(name.indexOf("001.png")){
+      this.setData({
+        'dhdyButBgImg': 'data:image/png;base64,' + base64
+      });
+    }
   },
   getWindowSize:function(){
     scenicDistrict.setData({

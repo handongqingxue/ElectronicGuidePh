@@ -11,7 +11,7 @@
 	<view class="but_view small_but_view" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</view>
 </view>
 <view class="dhdy_view">
-  <view class="dhdy_but_view" style="background-image: url('/images/001.png');">
+  <view class="dhdy_but_view" style="background-image: url({{dhdyButBgImg}});">
     <view class="lr_but_view dh_but_view">
       <image src="/images/002.png"></image>
       <view>导航</view>
