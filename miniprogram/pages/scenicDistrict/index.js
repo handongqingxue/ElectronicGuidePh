@@ -26,10 +26,11 @@ Page({
     //wx.setStorageSync('sceDisId', sceDisId);
     wx.setStorageSync('sceDisId', 1);
     scenicDistrict.getWindowSize();
-    scenicDistrict.initBackgroundImage(this.data.dhdyButBgImg);
+    //scenicDistrict.initBackgroundImage(this.data.dhdyButBgImg);
   },
   initBackgroundImage:function(name){
     let base64 = wx.getFileSystemManager().readFileSync(name, 'base64');
+    //console.log(base64)
     if(name.indexOf("001.png")){
       this.setData({
         'dhdyButBgImg': 'data:image/png;base64,' + base64
@@ -49,6 +50,7 @@ Page({
       //https://developers.weixin.qq.com/miniprogram/dev/component/canvas.html#Canvas-2D-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81
       //https://www.jb51.net/article/182288.htm
       scenicDistrict.selectSceDisById();
+      //scenicDistrict.initSceDisCanvas("http://tmp/VEVKyulCFuto9c4f4458d9905c2fa99bb56eb28a6276.jpg",false);
       /*
       var ctx = wx.createCanvasContext('sceDisCanvas')
       //ctx.drawImage("/images/database.png", 0, 0, 1550, 1200);
@@ -189,8 +191,11 @@ Page({
     //let sceDis=scenicDistrictData.sceDis;
     let sceDisCanvasImageX=scenicDistrictData.sceDisCanvasImageX;
     let sceDisCanvasImageY=scenicDistrictData.sceDisCanvasImageY;
+
+    scenicDistrict.setData({sceDisCanvasStyleWidth:1000,sceDisCanvasStyleHeight:1000})
     let sceDisCanvasStyleWidth=scenicDistrictData.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrictData.sceDisCanvasStyleHeight;
+    console.log("sceDisCanvasImageX="+sceDisCanvasImageX+",sceDisCanvasImageY="+sceDisCanvasImageY+",sceDisCanvasStyleWidth="+sceDisCanvasStyleWidth+",sceDisCanvasStyleHeight="+sceDisCanvasStyleHeight)
     let sceDisCanvas=null;
     if(reSizeFlag){
       scenicDistrict.clearSceDisCanvas();
@@ -202,6 +207,22 @@ Page({
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
     sceDisCanvas.draw();
+
+    //scenicDistrict.selectScenicPlaceList()
+  },
+  selectScenicPlaceList:function(){
+    wx.request({
+      //url: serverPathCQ+"selectSceDisById",
+      url:serverPathCQ+"requestSDApi",
+      method: 'POST',
+      data:{url:"http://120.27.5.36:8080/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
+      header: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      success: function (res) {
+          console.log(JSON.stringify(res))
+      }
+    })
   },
   changeCanvasSize:function(e){
     let bigflag=e.currentTarget.dataset.bigflag;
