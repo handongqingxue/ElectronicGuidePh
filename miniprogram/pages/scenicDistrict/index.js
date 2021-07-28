@@ -3,6 +3,7 @@
 var scenicDistrict;
 var serverPathCQ;
 var serverPath;
+var canvasScenicPlaceCount;
 Page({
 
   /**
@@ -127,7 +128,7 @@ Page({
       },
       success: function (res) {
         let data=res.data;
-        console.log(data);
+        //console.log(data);
         var status = res.data.status;
         if (status == "ok") {
           let sceDis=data.sceDis;
@@ -163,7 +164,7 @@ Page({
     wx.downloadFile({
       url:src,
       success:function(res){
-        console.log(JSON.stringify(res))
+        //console.log(JSON.stringify(res))
       },
       fail:function(res){
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
@@ -182,13 +183,13 @@ Page({
       }
     })
   },
-  getScenicPlaceImageInfo:function(scenicPlace,index){
-    console.log(scenicPlace);
+  getScenicPlaceImageInfo:function(scenicPlace){
+    //console.log(scenicPlace);
     wx.getImageInfo({
       src: "http://localhost:8080"+scenicPlace.picUrl,
       success: function (res){
-        scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight,index);
-        //scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,50,50,scenicPlace.picWidth,scenicPlace.picHeight,index);
+        scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight);
+        //scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,50,50,scenicPlace.picWidth,scenicPlace.picHeight);
       },
       fail: function(res){
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
@@ -204,7 +205,7 @@ Page({
     //scenicDistrict.setData({sceDisCanvasStyleWidth:1000,sceDisCanvasStyleHeight:1000})
     let sceDisCanvasStyleWidth=scenicDistrictData.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrictData.sceDisCanvasStyleHeight;
-    console.log("sceDisCanvasImageX="+sceDisCanvasImageX+",sceDisCanvasImageY="+sceDisCanvasImageY+",sceDisCanvasStyleWidth="+sceDisCanvasStyleWidth+",sceDisCanvasStyleHeight="+sceDisCanvasStyleHeight)
+    //console.log("sceDisCanvasImageX="+sceDisCanvasImageX+",sceDisCanvasImageY="+sceDisCanvasImageY+",sceDisCanvasStyleWidth="+sceDisCanvasStyleWidth+",sceDisCanvasStyleHeight="+sceDisCanvasStyleHeight)
     let sceDisCanvas=null;
     if(reSizeFlag){
       scenicDistrict.clearSceDisCanvas();
@@ -230,28 +231,34 @@ Page({
         let data=res.data;
         let scenicPlaceList=data.scenicPlaceList;
         scenicDistrict.setData({scenicPlaceLength:scenicPlaceList.length});
+        canvasScenicPlaceCount=0;
         for(let i=0;i<scenicPlaceList.length;i++){
           //if(i==2)
-            scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i],i);
+            scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i]);
         }
       }
     })
   },
-  drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight,index){
+  drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
+    canvasScenicPlaceCount++;
+    //console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
+    let sceDisCanvasStyleWidth=scenicDistrict.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
-    sceDisCanvas.drawImage(picUrl, x-picWidth/2, sceDisCanvasStyleHeight-y-picHeight/2, picWidth, picHeight);
+    let sceDisCanvasMinWidth=scenicDistrict.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicDistrict.data.sceDisCanvasMinHeight;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    sceDisCanvas.drawImage(picUrl, x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
 
     sceDisCanvas.font = 'normal bold 10px sans-serif';
     sceDisCanvas.setTextAlign('center'); // 文字居中
     sceDisCanvas.setFillStyle("#222");
-    sceDisCanvas.fillText(name, x,sceDisCanvasStyleHeight-y+picHeight)
+    sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
     let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
-    if(index==scenicPlaceLength-1){
-      setTimeout(function(){
-        sceDisCanvas.draw();
-      },"5000");
+    if(canvasScenicPlaceCount==scenicPlaceLength){
+      sceDisCanvas.draw();
     }
   },
   changeCanvasSize:function(e){
