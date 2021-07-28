@@ -19,6 +19,13 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    wx.getLocation({
+      type: 'wgs84',
+      success:function(res){        
+        //console.log(res.longitude+","+res.latitude)
+        scenicDistrict.setData({longitude:res.longitude,latitude:res.latitude});
+      }
+    })
 
     scenicDistrict=this;
     serverPathCQ=getApp().getServerPathCQ();
@@ -128,7 +135,7 @@ Page({
       },
       success: function (res) {
         let data=res.data;
-        //console.log(data);
+        console.log(data);
         var status = res.data.status;
         if (status == "ok") {
           let sceDis=data.sceDis;
@@ -146,6 +153,7 @@ Page({
             sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
           });
           
+          scenicDistrict.jiSuanLocationScale(data.sceDis);
           //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
           //https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg
           scenicDistrict.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
@@ -159,6 +167,12 @@ Page({
         //scenicDistrict.getSceDisImageInfo("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
       }
     })
+  },
+  jiSuanLocationScale:function(sceDis){
+    let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
+    let locationHeightScale=(sceDis.latitudeEnd-sceDis.latitudeStart)/sceDis.mapHeight;
+    console.log(locationWidthScale+","+locationHeightScale);
+    scenicDistrict.setData({locationWidthScale:locationWidthScale,locationHeightScale:locationHeightScale});
   },
   downloadFile:function(src){
     wx.downloadFile({
@@ -259,11 +273,32 @@ Page({
     //小程序绘制文字默认以文字中心为原点，而h5页面是以文字左下角为原点。这里不用重新计算
     sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
-    let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
+    let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
-      sceDisCanvas.draw();
+      scenicDistrict.drawMeLocation();
     }
+  },
+  drawMeLocation:function(){
+    let picWidth=34;
+    let picHeight=42;
+    let sceDisCanvasStyleWidth=scenicDistrict.data.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=scenicDistrict.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicDistrict.data.sceDisCanvasMinHeight;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    let x=(scenicDistrict.data.longitude-scenicDistrict.data.sceDis.longitudeStart)/scenicDistrict.data.locationWidthScale;
+    let y=(scenicDistrict.data.latitude-scenicDistrict.data.sceDis.latitudeStart)/scenicDistrict.data.locationHeightScale;
+    console.log(x+","+y);
+    let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
+    sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
+    
+    scenicDistrict.drawSceDisCanvas();
+  },
+  drawSceDisCanvas:function(){
+    let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
+    sceDisCanvas.draw();
   },
   changeCanvasSize:function(e){
     let bigflag=e.currentTarget.dataset.bigflag;
