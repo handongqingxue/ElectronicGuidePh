@@ -1,7 +1,7 @@
 //app.js
-var serverPathCQ = "https://www.qrcodesy.com/ElectronicGuideCQ/wechatApplet/";
+//var serverPathCQ = "https://www.qrcodesy.com/ElectronicGuideCQ/wechatApplet/";
 //var serverPathCQ = "https://www.bainuojiaoche.com/ElectronicGuideCQ/wechatApplet/";
-//var serverPathCQ = "http://192.168.2.166:8080/ElectronicGuideCQ/wechatApplet/";
+var serverPathCQ = "http://192.168.2.166:8080/ElectronicGuideCQ/wechatApplet/";
 var serverPath = "https://www.qrcodesy.com";
 //var serverPath = "http://www.bainuojiaoche.com";
 

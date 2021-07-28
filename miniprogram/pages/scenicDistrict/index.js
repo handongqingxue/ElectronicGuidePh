@@ -147,15 +147,15 @@ Page({
           
           //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
           //https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg
-          scenicDistrict.getImageInfo("sceDisCanvas",serverPath+data.sceDis.mapUrl);
-          //scenicDistrict.getImageInfo("sceDisCanvas","https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
+          scenicDistrict.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
+          //scenicDistrict.getSceDisImageInfo("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
         }
       },
       fail:function(res){
         getApp().showToast(serverPathCQ);
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
         //scenicDistrict.downloadFile("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
-        //scenicDistrict.getImageInfo("sceDisCanvas","https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
+        //scenicDistrict.getSceDisImageInfo("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
       }
     })
   },
@@ -170,16 +170,24 @@ Page({
       }
     });
   },
-  getImageInfo:function(flag,src){
+  getSceDisImageInfo:function(src){
     wx.getImageInfo({
       src: src,
       success: function (res){
-        switch(flag){
-          case "sceDisCanvas":
-            scenicDistrict.setData({sceDisCanvasImagePath:res.path})
-            scenicDistrict.initSceDisCanvas(res.path,false);
-            break;
-        }
+        scenicDistrict.setData({sceDisCanvasImagePath:res.path})
+        scenicDistrict.initSceDisCanvas(res.path,false);
+      },
+      fail: function(res){
+        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
+      }
+    })
+  },
+  getScenicPlaceImageInfo:function(scenicPlace,index){
+    console.log(scenicPlace);
+    wx.getImageInfo({
+      src: "http://localhost:8080"+scenicPlace.picUrl,
+      success: function (res){
+        scenicDistrict.drawScenicPlace(res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight,index);
       },
       fail: function(res){
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
@@ -192,7 +200,7 @@ Page({
     let sceDisCanvasImageX=scenicDistrictData.sceDisCanvasImageX;
     let sceDisCanvasImageY=scenicDistrictData.sceDisCanvasImageY;
 
-    scenicDistrict.setData({sceDisCanvasStyleWidth:1000,sceDisCanvasStyleHeight:1000})
+    //scenicDistrict.setData({sceDisCanvasStyleWidth:1000,sceDisCanvasStyleHeight:1000})
     let sceDisCanvasStyleWidth=scenicDistrictData.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrictData.sceDisCanvasStyleHeight;
     console.log("sceDisCanvasImageX="+sceDisCanvasImageX+",sceDisCanvasImageY="+sceDisCanvasImageY+",sceDisCanvasStyleWidth="+sceDisCanvasStyleWidth+",sceDisCanvasStyleHeight="+sceDisCanvasStyleHeight)
@@ -206,23 +214,34 @@ Page({
       scenicDistrict.setData({sceDisCanvas:sceDisCanvas});
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
-    sceDisCanvas.draw();
 
-    //scenicDistrict.selectScenicPlaceList()
+    scenicDistrict.selectScenicPlaceList()
   },
   selectScenicPlaceList:function(){
     wx.request({
-      //url: serverPathCQ+"selectSceDisById",
       url:serverPathCQ+"requestSDApi",
       method: 'POST',
-      data:{url:"http://120.27.5.36:8080/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
+      data:{url:"http://localhost:8080/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
       header: {
         'content-type': 'application/x-www-form-urlencoded',
       },
       success: function (res) {
-          console.log(JSON.stringify(res))
+        let data=res.data;
+        let scenicPlaceList=data.scenicPlaceList;
+        scenicDistrict.setData({scenicPlaceLength:scenicPlaceList.length});
+        for(let i=0;i<scenicPlaceList.length;i++){
+          scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i],i);
+        }
       }
     })
+  },
+  drawScenicPlace:function(picUrl,x,y,picWidth,picHeight,index){
+    let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
+    sceDisCanvas.drawImage(picUrl, x, y, picWidth, picHeight);
+    let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
+    if(index==scenicPlaceLength-1){
+      sceDisCanvas.draw();
+    }
   },
   changeCanvasSize:function(e){
     let bigflag=e.currentTarget.dataset.bigflag;
