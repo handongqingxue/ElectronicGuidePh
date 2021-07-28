@@ -22,5 +22,5 @@
       <view>导游</view>
     </view>
   </view>
-  <view>{{toastMsg}}</view>
+  <view style="display:none;">{{toastMsg}}</view>
 </view>

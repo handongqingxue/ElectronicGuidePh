@@ -187,7 +187,8 @@ Page({
     wx.getImageInfo({
       src: "http://localhost:8080"+scenicPlace.picUrl,
       success: function (res){
-        scenicDistrict.drawScenicPlace(res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight,index);
+        scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight,index);
+        //scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,50,50,scenicPlace.picWidth,scenicPlace.picHeight,index);
       },
       fail: function(res){
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
@@ -230,17 +231,27 @@ Page({
         let scenicPlaceList=data.scenicPlaceList;
         scenicDistrict.setData({scenicPlaceLength:scenicPlaceList.length});
         for(let i=0;i<scenicPlaceList.length;i++){
-          scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i],i);
+          //if(i==2)
+            scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i],i);
         }
       }
     })
   },
-  drawScenicPlace:function(picUrl,x,y,picWidth,picHeight,index){
+  drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight,index){
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
-    sceDisCanvas.drawImage(picUrl, x, y, picWidth, picHeight);
+    let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
+    sceDisCanvas.drawImage(picUrl, x-picWidth/2, sceDisCanvasStyleHeight-y-picHeight/2, picWidth, picHeight);
+
+    sceDisCanvas.font = 'normal bold 10px sans-serif';
+    sceDisCanvas.setTextAlign('center'); // 文字居中
+    sceDisCanvas.setFillStyle("#222");
+    sceDisCanvas.fillText(name, x,sceDisCanvasStyleHeight-y+picHeight)
+
     let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
     if(index==scenicPlaceLength-1){
-      sceDisCanvas.draw();
+      setTimeout(function(){
+        sceDisCanvas.draw();
+      },"5000");
     }
   },
   changeCanvasSize:function(e){
