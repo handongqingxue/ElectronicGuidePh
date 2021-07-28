@@ -198,9 +198,10 @@ Page({
     })
   },
   getScenicPlaceImageInfo:function(scenicPlace){
-    //console.log(scenicPlace);
+    //console.log(scenicPlace.picUrl);
     wx.getImageInfo({
-      src: "http://localhost:8080"+scenicPlace.picUrl,
+      //src: "https://localhost"+scenicPlace.picUrl,
+      src: "https://www.qrcodesy.com"+scenicPlace.picUrl,
       success: function (res){
         scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight);
         //scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,50,50,scenicPlace.picWidth,scenicPlace.picHeight);
@@ -237,7 +238,8 @@ Page({
     wx.request({
       url:serverPathCQ+"requestSDApi",
       method: 'POST',
-      data:{url:"http://localhost:8080/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
+      data:{url:"https://www.qrcodesy.com/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
+      //data:{url:"https://localhost/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
       header: {
         'content-type': 'application/x-www-form-urlencoded',
       },
@@ -255,7 +257,7 @@ Page({
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     canvasScenicPlaceCount++;
-    //console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
+    console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     let sceDisCanvasStyleWidth=scenicDistrict.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
