@@ -249,14 +249,18 @@ Page({
     let sceDisCanvasMinHeight=scenicDistrict.data.sceDisCanvasMinHeight;
     let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
     let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    //h5页面随着地图放大，坐标自动跟着改变。小程序端不一样，必须根据比例重新计算出坐标位置
+    //h5页面绘制图片是以图片中心点为原点，小程序是以图片左下角为原点。若要做到和h5页面一样，需要用坐标减去图片宽度或高度的一半
     sceDisCanvas.drawImage(picUrl, x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
 
     sceDisCanvas.font = 'normal bold 10px sans-serif';
     sceDisCanvas.setTextAlign('center'); // 文字居中
     sceDisCanvas.setFillStyle("#222");
+    //小程序绘制文字默认以文字中心为原点，而h5页面是以文字左下角为原点。这里不用重新计算
     sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
     let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
+    //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
     if(canvasScenicPlaceCount==scenicPlaceLength){
       sceDisCanvas.draw();
     }
