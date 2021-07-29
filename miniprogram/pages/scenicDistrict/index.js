@@ -358,9 +358,14 @@ Page({
     let pageY=e.touches[0].pageY;
     let scrollLeft=scenicDistrict.data.sceDisCanvasScrollLeft;
     let scrollTop=scenicDistrict.data.sceDisCanvasScrollTop;
+    let sceDisCanvasMinWidth=scenicDistrict.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicDistrict.data.sceDisCanvasMinHeight;
+    let sceDisCanvasStyleWidth=scenicDistrict.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
-    let x=scrollLeft+pageX;
-    let y=sceDisCanvasStyleHeight-scrollTop-pageY;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    let x=(scrollLeft+pageX)/widthScale;
+    let y=(sceDisCanvasStyleHeight-scrollTop-pageY)/heightScale;
     console.log(x+","+y);
     let scenicPlaceList=scenicDistrict.data.scenicPlaceList;
     for(let i=0;i<scenicPlaceList.length;i++){
