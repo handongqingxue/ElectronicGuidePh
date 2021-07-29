@@ -1,6 +1,6 @@
 <!--miniprogram/pages/scenicDistrict/index.wxml-->
-<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;">
-  <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;">
+<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;" bindscroll="scrollCanvas">
+  <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
   </canvas>
 </scroll-view>
 <view class="scale_set_view">

@@ -12,6 +12,8 @@ Page({
   data: {
     sceDisCanvasImageX:0,
     sceDisCanvasImageY:0,
+    sceDisCanvasScrollLeft:0,
+    sceDisCanvasScrollTop:0,
     dhdyButBgImg:'/images/001.png'
   },
 
@@ -246,7 +248,7 @@ Page({
       success: function (res) {
         let data=res.data;
         let scenicPlaceList=data.scenicPlaceList;
-        scenicDistrict.setData({scenicPlaceLength:scenicPlaceList.length});
+        scenicDistrict.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
         canvasScenicPlaceCount=0;
         for(let i=0;i<scenicPlaceList.length;i++){
           //if(i==2)
@@ -350,5 +352,28 @@ Page({
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     sceDisCanvas.clearRect(0, 0, sceDis.mapWidth, sceDis.mapHeight);
     sceDisCanvas.draw(true);
+  },
+  getTouchPoint:function(e){
+    let pageX=e.touches[0].pageX;
+    let pageY=e.touches[0].pageY;
+    let scrollLeft=scenicDistrict.data.sceDisCanvasScrollLeft;
+    let scrollTop=scenicDistrict.data.sceDisCanvasScrollTop;
+    let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
+    let x=scrollLeft+pageX;
+    let y=sceDisCanvasStyleHeight-scrollTop-pageY;
+    console.log(x+","+y);
+    let scenicPlaceList=scenicDistrict.data.scenicPlaceList;
+    for(let i=0;i<scenicPlaceList.length;i++){
+      let scenicPlace=scenicPlaceList[i];
+      let startX=scenicPlace.x-scenicPlace.picWidth/2;
+      let endX=scenicPlace.x+scenicPlace.picWidth/2;
+      let startY=scenicPlace.y-scenicPlace.picHeight/2;
+      let endY=scenicPlace.y+scenicPlace.picHeight/2;
+      if(x>=startX&x<=endX&y>=startY&y<=endY)
+        console.log(scenicPlace.name);
+    }
+  },
+  scrollCanvas:function(e){
+    scenicDistrict.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   }
 })
