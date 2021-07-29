@@ -1,26 +1,31 @@
 <!--miniprogram/pages/scenicDistrict/index.wxml-->
-<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;" bindscroll="scrollCanvas">
-  <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
-  </canvas>
+<!--https://blog.csdn.net/weixin_39872588/article/details/81014385-->
+<!--https://blog.csdn.net/qq_15964039/article/details/80107616-->
+<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;" bindscroll="scrollCanvas">
+    <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
+    </canvas>
 </scroll-view>
-<view class="scale_set_view">
-	<view class="but_view reset_but_view" data-bigflag="{{null}}" data-resetflag="{{true}}" catchtap="changeCanvasSize">
-		<image alt="" src="/images/005.png"></image>
-	</view>
-	<view class="but_view big_but_view" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</view>
-	<view class="but_view small_but_view" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</view>
-</view>
-<view class="dhdy_view">
-  <view class="dhdy_but_view" style="background-image: url({{dhdyButBgImg}});">
-    <view class="lr_but_view dh_but_view">
-      <image src="/images/002.png"></image>
-      <view>导航</view>
-    </view>
-    <image class="lx_but_img" src="/images/003.png"></image>
-    <view class="lr_but_view dy_but_view">
-      <image src="/images/004.png"></image>
-      <view>导游</view>
-    </view>
-  </view>
+<cover-view class="scale_set_view">
+	<cover-view class="but_view reset_but_view" data-bigflag="{{null}}" data-resetflag="{{true}}" catchtap="changeCanvasSize">
+		<cover-image alt="" src="/images/005.png"></cover-image>
+	</cover-view>
+	<cover-view class="but_view big_but_view" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</cover-view>
+	<cover-view class="but_view small_but_view" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</cover-view>
+</cover-view>
+<cover-view class="dhdy_view">
+  <cover-image class="dhdyButBg_ci" src="/images/001.png"></cover-image>
+  <cover-view class="dhdy_but_view">
+    <cover-view class="lr_but_view dh_but_view">
+      <cover-image src="/images/002.png"></cover-image>
+      <cover-view>导航</cover-view>
+    </cover-view>
+    <cover-image class="lx_but_img" src="/images/003.png"></cover-image>
+    <cover-view class="lr_but_view dy_but_view">
+      <cover-image src="/images/004.png"></cover-image>
+      <cover-view>导游</cover-view>
+    </cover-view>
+  </cover-view>
+  <!--
   <view style="display:none;">{{toastMsg}}</view>
-</view>
+  -->
+</cover-view>

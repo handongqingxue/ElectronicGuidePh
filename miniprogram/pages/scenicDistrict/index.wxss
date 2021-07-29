@@ -1,4 +1,5 @@
 /* miniprogram/pages/scenicDistrict/index.wxss */
+/*https://blog.csdn.net/xd_yangxiaoromg/article/details/88258744*/
 .scale_set_view{
   width:30px;
   height:94px;
@@ -30,8 +31,11 @@
 .dhdy_view{
   width:100%;height:50px;bottom:10%; position:fixed;
 }
+.dhdyButBg_ci{
+  width:200px;height:50px;margin: auto;
+}
 .dhdy_but_view{
-  width:200px;height:50px;margin: 0 auto;background-size:100% 100%;
+  width:200px;height:50px;margin: -50px auto 0;background-size:100% 100%;
 }
 .dhdy_but_view .lr_but_view{
   width:60px;height:25px;position:absolute;
@@ -42,11 +46,11 @@
 .dhdy_but_view .dy_but_view{
   margin-top:-40px;margin-left:135px;
 }
-.dhdy_but_view .lr_but_view image{
+.dhdy_but_view .lr_but_view cover-image{
   width:24px;height:22px;
 }
-.dhdy_but_view .lr_but_view view{
-  width:30px;height:20px;font-size:13px;margin-top: -25px;margin-left: 27px;
+.dhdy_but_view .lr_but_view cover-view{
+  width:30px;height:20px;font-size:13px;margin-top: -20px;margin-left: 27px;
 }
 .dhdy_but_view .lx_but_img{
   width:50px;height:50px;margin-left:80px;
