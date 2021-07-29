@@ -5,22 +5,22 @@
     <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
     </canvas>
 </scroll-view>
-<cover-view class="scale_set_view">
-	<cover-view class="but_view reset_but_view" data-bigflag="{{null}}" data-resetflag="{{true}}" catchtap="changeCanvasSize">
+<cover-view class="scale_set_cv">
+	<cover-view class="but_cv reset_but_cv" data-bigflag="{{null}}" data-resetflag="{{true}}" catchtap="changeCanvasSize">
 		<cover-image alt="" src="/images/005.png"></cover-image>
 	</cover-view>
-	<cover-view class="but_view big_but_view" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</cover-view>
-	<cover-view class="but_view small_but_view" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</cover-view>
+	<cover-view class="but_cv big_but_cv" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</cover-view>
+	<cover-view class="but_cv small_but_cv" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</cover-view>
 </cover-view>
-<cover-view class="dhdy_view">
+<cover-view class="dhdy_cv">
   <cover-image class="dhdyButBg_ci" src="/images/001.png"></cover-image>
-  <cover-view class="dhdy_but_view">
-    <cover-view class="lr_but_view dh_but_view">
+  <cover-view class="dhdy_but_cv">
+    <cover-view class="lr_but_cv dh_but_cv">
       <cover-image src="/images/002.png"></cover-image>
       <cover-view>导航</cover-view>
     </cover-view>
-    <cover-image class="lx_but_img" src="/images/003.png"></cover-image>
-    <cover-view class="lr_but_view dy_but_view">
+    <cover-image class="lx_but_ci" src="/images/003.png"></cover-image>
+    <cover-view class="lr_but_cv dy_but_cv">
       <cover-image src="/images/004.png"></cover-image>
       <cover-view>导游</cover-view>
     </cover-view>

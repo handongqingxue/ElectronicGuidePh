@@ -13,8 +13,7 @@ Page({
     sceDisCanvasImageX:0,
     sceDisCanvasImageY:0,
     sceDisCanvasScrollLeft:0,
-    sceDisCanvasScrollTop:0,
-    dhdyButBgImg:'/images/001.png'
+    sceDisCanvasScrollTop:0
   },
 
   /**
@@ -36,16 +35,6 @@ Page({
     //wx.setStorageSync('sceDisId', sceDisId);
     wx.setStorageSync('sceDisId', 1);
     scenicDistrict.getWindowSize();
-    //scenicDistrict.initBackgroundImage(this.data.dhdyButBgImg);
-  },
-  initBackgroundImage:function(name){
-    let base64 = wx.getFileSystemManager().readFileSync(name, 'base64');
-    //console.log(base64)
-    if(name.indexOf("001.png")){
-      this.setData({
-        'dhdyButBgImg': 'data:image/png;base64,' + base64
-      });
-    }
   },
   getWindowSize:function(){
     scenicDistrict.setData({
