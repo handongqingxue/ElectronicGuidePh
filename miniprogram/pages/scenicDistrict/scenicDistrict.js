@@ -2,6 +2,7 @@
 //https://blog.csdn.net/qq_19741181/article/details/104505264
 var scenicDistrict;
 var serverPathCQ;
+var serverPathSD;
 var serverPath;
 var canvasScenicPlaceCount;
 Page({
@@ -143,6 +144,7 @@ Page({
             sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
             sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
           });
+          serverPathSD="https://"+scenicDistrict.data.sceDis.serverName+"/ElectronicGuideSD/";
           
           scenicDistrict.jiSuanLocationScale(data.sceDis);
           //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
@@ -227,10 +229,8 @@ Page({
   },
   selectScenicPlaceList:function(){
     wx.request({
-      url:serverPathCQ+"requestSDApi",
+      url:serverPathSD+"wechatApplet/selectScenicPlaceList",
       method: 'POST',
-      data:{url:"https://www.qrcodesy.com/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
-      //data:{url:"https://localhost/ElectronicGuideSD/wechatApplet/selectScenicPlaceList"},
       header: {
         'content-type': 'application/x-www-form-urlencoded',
       },
@@ -369,5 +369,10 @@ Page({
   },
   scrollCanvas:function(e){
     scenicDistrict.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
+  },
+  goAllScenicPlace:function(){
+    wx.redirectTo({
+      url: '/pages/scenicPlace/scenicPlace',
+    })
   }
 })

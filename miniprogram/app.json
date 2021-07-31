@@ -1,6 +1,6 @@
 {
   "pages": [
-    "pages/scenicDistrict/index",
+    "pages/scenicDistrict/scenicDistrict",
     "pages/index/index",
     "pages/getOpenId/index",
     "pages/getMiniProgramCode/index",
@@ -12,10 +12,13 @@
     "pages/updateRecordResult/index",
     "pages/updateRecordSuccess/index",
     "pages/sumRecord/index",
-    "pages/sumRecordResult/index"
+    "pages/sumRecordResult/index",
+    "pages/scenicPlace/scenicPlace"
   ],
   "permission": {
-    "scope.userLocation": {"desc":"aaaaaaaaaaaa"}
+    "scope.userLocation": {
+      "desc": "aaaaaaaaaaaa"
+    }
   },
   "window": {
     "backgroundColor": "#F6F6F6",

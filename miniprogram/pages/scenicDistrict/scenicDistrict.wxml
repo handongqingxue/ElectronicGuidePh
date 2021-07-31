@@ -1,4 +1,4 @@
-<!--miniprogram/pages/scenicDistrict/index.wxml-->
+<!--miniprogram/pages/scenicDistrict/scenicDistrict.wxml-->
 <!--https://blog.csdn.net/weixin_39872588/article/details/81014385-->
 <!--https://blog.csdn.net/qq_15964039/article/details/80107616-->
 <scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;" bindscroll="scrollCanvas">
@@ -15,7 +15,7 @@
 <cover-view class="dhdy_cv">
   <cover-image class="dhdyButBg_ci" src="/images/001.png"></cover-image>
   <cover-view class="dhdy_but_cv">
-    <cover-view class="lr_but_cv dh_but_cv">
+    <cover-view class="lr_but_cv dh_but_cv" catchtap="goAllScenicPlace">
       <cover-image src="/images/002.png"></cover-image>
       <cover-view>导航</cover-view>
     </cover-view>
