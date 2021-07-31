@@ -1,0 +1,28 @@
+/* pages/scenicPlace/scenicPlace.wxss */
+.scale_set_cv{
+  width:30px;
+  height:94px;
+  right:5px;
+  bottom:120px;
+  position: fixed;
+}
+.scale_set_cv .but_cv{
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	color:#999;
+	font-size:30px;
+	text-align:center; 
+	background-color: #F6F6F6;
+}
+.scale_set_cv .reset_but_cv cover-image{
+  width:21px;
+  height: 21px;
+	margin: 5px auto 0;
+}
+.scale_set_cv .big_but_cv{
+	margin-top:3px;
+}
+.scale_set_cv .small_but_cv{
+	border-top: #999 solid 1px;
+}

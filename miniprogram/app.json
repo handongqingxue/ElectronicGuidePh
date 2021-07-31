@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/allScenicPlace/allScenicPlace",
     "pages/scenicDistrict/scenicDistrict",
     "pages/index/index",
     "pages/getOpenId/index",
@@ -12,8 +13,7 @@
     "pages/updateRecordResult/index",
     "pages/updateRecordSuccess/index",
     "pages/sumRecord/index",
-    "pages/sumRecordResult/index",
-    "pages/scenicPlace/scenicPlace"
+    "pages/sumRecordResult/index"
   ],
   "permission": {
     "scope.userLocation": {

@@ -1,5 +1,0 @@
-<!--miniprogram/pages/scenicPlace/scenicPlace.wxml-->
-<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;" bindscroll="scrollCanvas">
-    <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
-    </canvas>
-</scroll-view>

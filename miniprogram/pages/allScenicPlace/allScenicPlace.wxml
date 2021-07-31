@@ -1,0 +1,12 @@
+<!--miniprogram/pages/scenicPlace/scenicPlace.wxml-->
+<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;" bindscroll="scrollCanvas">
+    <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
+    </canvas>
+</scroll-view>
+<cover-view class="scale_set_cv">
+	<cover-view class="but_cv reset_but_cv" data-bigflag="{{null}}" data-resetflag="{{true}}" catchtap="changeCanvasSize">
+		<cover-image alt="" src="/images/005.png"></cover-image>
+	</cover-view>
+	<cover-view class="but_cv big_but_cv" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</cover-view>
+	<cover-view class="but_cv small_but_cv" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</cover-view>
+</cover-view>
