@@ -277,9 +277,31 @@ Page({
       let endX=scenicPlace.x+scenicPlace.picWidth/2;
       let startY=scenicPlace.y-scenicPlace.picHeight/2;
       let endY=scenicPlace.y+scenicPlace.picHeight/2;
-      if(x>=startX&x<=endX&y>=startY&y<=endY)
+      if(x>=startX&x<=endX&y>=startY&y<=endY){
         console.log(scenicPlace.name);
+        allScenicPlace.navToDestination();
+      }
     }
+  },
+  navToDestination:function(){
+    wx.request({
+      url:serverPathSD+"wechatApplet/navToDestination",
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      success: function (res) {
+        let data=res.data;
+        console.log(data.roadDotList)
+        let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
+        sceDisCanvas.beginPath(); //创建一条路径   
+        sceDisCanvas.setStrokeStyle('red');   //设置边框为红色
+        sceDisCanvas.moveTo(100,100) //描述路径的起点为手指触摸的x轴和y轴
+        sceDisCanvas.lineTo(568,65) //绘制一条直线，终点坐标为手指触摸结束后的x轴和y轴
+        sceDisCanvas.stroke() //画出当前路径的边框
+        sceDisCanvas.draw();
+      }
+    })
   },
 
   /**
