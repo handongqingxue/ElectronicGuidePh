@@ -10,7 +10,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    navFlag:false
   },
 
   /**
@@ -198,7 +198,10 @@ Page({
     let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
     sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
     
-    allScenicPlace.drawSceDisCanvas();
+    if(allScenicPlace.data.navFlag)
+      allScenicPlace.drawNavRoadLine();
+    else
+      allScenicPlace.drawSceDisCanvas();
   },
   drawSceDisCanvas:function(){
     let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
@@ -292,16 +295,34 @@ Page({
       },
       success: function (res) {
         let data=res.data;
-        console.log(data.roadDotList)
-        let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
-        sceDisCanvas.beginPath(); //创建一条路径   
-        sceDisCanvas.setStrokeStyle('red');   //设置边框为红色
-        sceDisCanvas.moveTo(100,100) //描述路径的起点为手指触摸的x轴和y轴
-        sceDisCanvas.lineTo(568,65) //绘制一条直线，终点坐标为手指触摸结束后的x轴和y轴
-        sceDisCanvas.stroke() //画出当前路径的边框
-        sceDisCanvas.draw();
+        allScenicPlace.setData({roadDotList:data.roadDotList});
+        allScenicPlace.setData({navFlag:true});
+        allScenicPlace.initSceDisCanvas(allScenicPlace.data.sceDisCanvasImagePath,true);
       }
     })
+  },
+  drawNavRoadLine:function(){
+
+    let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
+    sceDisCanvas.beginPath(); //创建一条路径   
+    sceDisCanvas.setStrokeStyle('red');   //设置边框为红色
+    let x1=962;
+    let y1=385;
+    let x2=568;
+    let y2=65;
+    allScenicPlace.setRoadDotLocation(sceDisCanvas,962,385,568,65);
+    sceDisCanvas.stroke() //画出当前路径的边框
+    sceDisCanvas.draw();
+  },
+  setRoadDotLocation:function(sceDisCanvas,x1,y1,x2,y2){
+    let sceDisCanvasStyleWidth=allScenicPlace.data.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=allScenicPlace.data.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=allScenicPlace.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=allScenicPlace.data.sceDisCanvasMinHeight;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    sceDisCanvas.moveTo(x1*widthScale,sceDisCanvasStyleHeight-y1*heightScale) //描述路径的起点为手指触摸的x轴和y轴
+    sceDisCanvas.lineTo(x2*widthScale,sceDisCanvasStyleHeight-y2*heightScale) //绘制一条直线，终点坐标为手指触摸结束后的x轴和y轴
   },
 
   /**
