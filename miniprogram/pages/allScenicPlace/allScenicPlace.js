@@ -195,6 +195,7 @@ Page({
     let x=(allScenicPlace.data.longitude-allScenicPlace.data.sceDis.longitudeStart)/allScenicPlace.data.locationWidthScale;
     let y=(allScenicPlace.data.latitude-allScenicPlace.data.sceDis.latitudeStart)/allScenicPlace.data.locationHeightScale;
     console.log(x+","+y);
+    allScenicPlace.setData({meX:x,meY:y});
     let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
     sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
     
@@ -281,21 +282,26 @@ Page({
       let startY=scenicPlace.y-scenicPlace.picHeight/2;
       let endY=scenicPlace.y+scenicPlace.picHeight/2;
       if(x>=startX&x<=endX&y>=startY&y<=endY){
-        console.log(scenicPlace.name);
-        allScenicPlace.navToDestination();
+        console.log(scenicPlace.name+",x="+scenicPlace.x+",y="+scenicPlace.y);
+        allScenicPlace.navToDestination(scenicPlace.x,scenicPlace.y);
       }
     }
   },
-  navToDestination:function(){
+  navToDestination:function(scenicPlaceX,scenicPlaceY){
+    //let meX=allScenicPlace.data.meX;
+    //let meY=allScenicPlace.data.meY;
+    let meX=1250;
+    let meY=580;
     wx.request({
       url:serverPathSD+"wechatApplet/navToDestination",
+      data:{meX:meX,meY:meY,scenicPlaceX:scenicPlaceX,scenicPlaceY:scenicPlaceY},
       method: 'POST',
       header: {
         'content-type': 'application/x-www-form-urlencoded',
       },
       success: function (res) {
         let data=res.data;
-        allScenicPlace.setData({roadDotList:data.roadDotList});
+        allScenicPlace.setData({roadStageList:data.roadStageList});
         allScenicPlace.setData({navFlag:true});
         allScenicPlace.initSceDisCanvas(allScenicPlace.data.sceDisCanvasImagePath,true);
       }
@@ -310,11 +316,20 @@ Page({
     let y1=385;
     let x2=568;
     let y2=65;
-    allScenicPlace.setRoadDotLocation(sceDisCanvas,962,385,568,65);
+    let roadStageList=allScenicPlace.data.roadStageList;
+    //allScenicPlace.setRoadStageLocation(sceDisCanvas,962,385,568,65);
+    allScenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
+    for(let i=0;i<roadStageList.length;i++){
+      //if(i==3)
+        //break;
+    console.log("==="+JSON.stringify(roadStageList[i]))
+      console.log("x1="+roadStageList[i].backX+",y1="+roadStageList[i].backY+",x2="+roadStageList[i].frontX+",y2="+roadStageList[i].frontY)
+      allScenicPlace.setRoadStageLocation(sceDisCanvas,roadStageList[i].backX,roadStageList[i].backY,roadStageList[i].frontX,roadStageList[i].frontY);
+    }
     sceDisCanvas.stroke() //画出当前路径的边框
     sceDisCanvas.draw();
   },
-  setRoadDotLocation:function(sceDisCanvas,x1,y1,x2,y2){
+  setRoadStageLocation:function(sceDisCanvas,x1,y1,x2,y2){
     let sceDisCanvasStyleWidth=allScenicPlace.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=allScenicPlace.data.sceDisCanvasStyleHeight;
     let sceDisCanvasMinWidth=allScenicPlace.data.sceDisCanvasMinWidth;
