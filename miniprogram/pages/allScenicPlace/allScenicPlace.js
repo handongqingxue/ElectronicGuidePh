@@ -320,7 +320,7 @@ Page({
     //allScenicPlace.setRoadStageLocation(sceDisCanvas,962,385,568,65);
     allScenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
     for(let i=0;i<roadStageList.length;i++){
-      //if(i==3)
+      //if(i==4)
         //break;
     console.log("==="+JSON.stringify(roadStageList[i]))
       console.log("x1="+roadStageList[i].backX+",y1="+roadStageList[i].backY+",x2="+roadStageList[i].frontX+",y2="+roadStageList[i].frontY)
