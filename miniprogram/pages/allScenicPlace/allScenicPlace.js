@@ -195,7 +195,7 @@ Page({
     let x=(allScenicPlace.data.longitude-allScenicPlace.data.sceDis.longitudeStart)/allScenicPlace.data.locationWidthScale;
     let y=(allScenicPlace.data.latitude-allScenicPlace.data.sceDis.latitudeStart)/allScenicPlace.data.locationHeightScale;
     console.log(x+","+y);
-    allScenicPlace.setData({meX:x,meY:y});
+    //allScenicPlace.setData({meX:x,meY:y});
     let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
     sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
     
@@ -292,6 +292,7 @@ Page({
     //let meY=allScenicPlace.data.meY;
     let meX=1250;
     let meY=580;
+    allScenicPlace.setData({meX:meX,meY:meY});
     wx.request({
       url:serverPathSD+"wechatApplet/navToDestination",
       data:{meX:meX,meY:meY,scenicPlaceX:scenicPlaceX,scenicPlaceY:scenicPlaceY},
@@ -312,20 +313,21 @@ Page({
     let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
     sceDisCanvas.beginPath(); //创建一条路径   
     sceDisCanvas.setStrokeStyle('red');   //设置边框为红色
-    let x1=962;
-    let y1=385;
+    let x1=allScenicPlace.data.meX;
+    let y1=allScenicPlace.data.meY;
     let x2=568;
     let y2=65;
     let roadStageList=allScenicPlace.data.roadStageList;
     //allScenicPlace.setRoadStageLocation(sceDisCanvas,962,385,568,65);
-    allScenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
+    //allScenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
     for(let i=0;i<roadStageList.length;i++){
       //if(i==4)
         //break;
-    console.log("==="+JSON.stringify(roadStageList[i]))
+      console.log("==="+JSON.stringify(roadStageList[i]))
       console.log("x1="+roadStageList[i].backX+",y1="+roadStageList[i].backY+",x2="+roadStageList[i].frontX+",y2="+roadStageList[i].frontY)
       allScenicPlace.setRoadStageLocation(sceDisCanvas,roadStageList[i].backX,roadStageList[i].backY,roadStageList[i].frontX,roadStageList[i].frontY);
     }
+    //allScenicPlace.setRoadStageLocation(sceDisCanvas,1097.00,572.00,1181.00,533);
     sceDisCanvas.stroke() //画出当前路径的边框
     sceDisCanvas.draw();
   },
