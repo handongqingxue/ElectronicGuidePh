@@ -16,6 +16,22 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    wx.getLocation({
+      type: 'wgs84',
+      success:function(res){        
+        //console.log(res.longitude+","+res.latitude)
+        scenicPlace.setData({longitude:res.longitude,latitude:res.latitude});
+      }
+    })
+
+    options.id=3;
+    options.name="岳家庄";
+    options.x=300;
+    options.y=300;
+    options.picUrl="/ElectronicGuide/upload/ScenicPlacePic/1628583735118.png";
+    options.picWidth=30;
+    options.picHeight=30;
+
     scenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
     serverPath=getApp().getServerPath();
@@ -170,6 +186,55 @@ Page({
   drawSceDisCanvas:function(){
     let sceDisCanvas=scenicPlace.data.sceDisCanvas;
     sceDisCanvas.draw();
+  },
+  changeCanvasSize:function(e){
+    let bigflag=e.currentTarget.dataset.bigflag;
+    let resetflag=e.currentTarget.dataset.resetflag;
+    let scenicPlaceData=scenicPlace.data;
+    let sceDisCanvasStyleWidth=scenicPlaceData.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=scenicPlaceData.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=scenicPlaceData.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicPlaceData.sceDisCanvasMinHeight;
+    let sceDisCanvasMaxWidth=scenicPlaceData.sceDisCanvasMaxWidth;
+    let sceDisCanvasMaxHeight=scenicPlaceData.sceDisCanvasMaxHeight;
+    //var mcw=sceDisCanvasStyleWidth;
+	  //var mch=sceDisCanvasStyleHeight;
+    if(resetflag){
+      sceDisCanvasStyleWidth=sceDisCanvasMinWidth;
+    }
+    else{
+      if(bigflag==1)
+        sceDisCanvasStyleWidth+=sceDisCanvasMinWidth*0.2;
+      else
+        sceDisCanvasStyleWidth-=sceDisCanvasMinWidth*0.2;
+    }
+	
+    if(sceDisCanvasStyleWidth<sceDisCanvasMinWidth){
+      sceDisCanvasStyleWidth=sceDisCanvasMinWidth;
+    }
+    else if(sceDisCanvasStyleWidth>sceDisCanvasMaxWidth){
+      sceDisCanvasStyleWidth=sceDisCanvasMaxWidth;
+    }
+  
+    if(sceDisCanvasStyleHeight<sceDisCanvasMinHeight){
+      sceDisCanvasStyleHeight=sceDisCanvasMinHeight;
+    }
+    else if(sceDisCanvasStyleHeight>sceDisCanvasMaxHeight){
+      sceDisCanvasStyleHeight=sceDisCanvasMaxHeight;
+    }
+    sceDisCanvasStyleHeight=sceDisCanvasStyleWidth*sceDisCanvasMinHeight/sceDisCanvasMinWidth;
+
+    scenicPlace.setData({
+      sceDisCanvasStyleWidth:sceDisCanvasStyleWidth,
+      sceDisCanvasStyleHeight:sceDisCanvasStyleHeight
+    })
+    scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+  },
+  clearSceDisCanvas:function(){
+    let sceDis=scenicPlace.data.sceDis;
+    let sceDisCanvas=scenicPlace.data.sceDisCanvas;
+    sceDisCanvas.clearRect(0, 0, sceDis.mapWidth, sceDis.mapHeight);
+    sceDisCanvas.draw(true);
   },
   scrollCanvas:function(e){
     scenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
