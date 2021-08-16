@@ -282,9 +282,16 @@ Page({
       let endY=scenicPlace.y+scenicPlace.picHeight/2;
       if(x>=startX&x<=endX&y>=startY&y<=endY){
         console.log(scenicPlace.name+",x="+scenicPlace.x+",y="+scenicPlace.y);
-        allScenicPlace.navToDestination(scenicPlace.x,scenicPlace.y);
+        //allScenicPlace.navToDestination(scenicPlace.x,scenicPlace.y);
+        allScenicPlace.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight);
       }
     }
+  },
+  goScenicPlace:function(id,name,x,y,picUrl,picWidth,picHeight){
+    //console.log(picUrl+","+x+","+y+","+picWidth)
+    wx.redirectTo({
+      url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight,
+    })
   },
   navToDestination:function(scenicPlaceX,scenicPlaceY){
     //let meX=allScenicPlace.data.meX;
