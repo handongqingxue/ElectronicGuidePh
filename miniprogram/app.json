@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/allScenicPlace/allScenicPlace",
     "pages/scenicDistrict/scenicDistrict",
+    "pages/allScenicPlace/allScenicPlace",
     "pages/index/index",
     "pages/getOpenId/index",
     "pages/getMiniProgramCode/index",

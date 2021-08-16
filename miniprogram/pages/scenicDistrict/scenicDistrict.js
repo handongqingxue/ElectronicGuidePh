@@ -372,7 +372,7 @@ Page({
   },
   goAllScenicPlace:function(){
     wx.redirectTo({
-      url: '/pages/scenicPlace/scenicPlace',
+      url: '/pages/allScenicPlace/allScenicPlace',
     })
   }
 })

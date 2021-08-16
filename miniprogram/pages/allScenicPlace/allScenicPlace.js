@@ -138,7 +138,7 @@ Page({
         allScenicPlace.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
         canvasScenicPlaceCount=0;
         for(let i=0;i<scenicPlaceList.length;i++){
-          //if(i==2)
+          //if(i==0)
           allScenicPlace.getScenicPlaceImageInfo(scenicPlaceList[i]);
         }
       }
@@ -159,7 +159,6 @@ Page({
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     canvasScenicPlaceCount++;
-    console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
     let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
     let sceDisCanvasStyleWidth=allScenicPlace.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=allScenicPlace.data.sceDisCanvasStyleHeight;
