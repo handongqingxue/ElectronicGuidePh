@@ -54,6 +54,25 @@ Page({
   onReady: function () {
     scenicPlace.selectSceDisById();
   },
+  selectRoadStageList:function(){
+    wx.request({
+      url:serverPathSD+"wechatApplet/selectRoadStageList",
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      success: function (res) {
+        let data=res.data;
+        if(data.status=="ok"){
+          scenicPlace.setData({roadStageList:data.roadStageList});
+          scenicPlace.initMinDistanceStage();
+        }
+      },
+      fail:function(res){
+
+      }
+    });
+  },
   selectSceDisById:function(){
     let sceDisId=wx.getStorageSync('sceDisId');
     wx.request({
@@ -85,6 +104,9 @@ Page({
           serverPathSD="https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuideSD/";
           scenicPlace.jiSuanLocationScale(data.sceDis);
           scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
+          scenicPlace.selectRoadStageList();
+
+          scenicPlace.setData({meX:1250,meY:580});
         }
       },
       fail:function(res){
@@ -266,12 +288,14 @@ Page({
     scenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
   navToDestination:function(){
-    //let meX=scenicPlace.data.meX;
-    //let meY=scenicPlace.data.meY;
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    /*
     let meX=1250;
     let meY=580;
     console.log(meX+","+meY);
     scenicPlace.setData({meX:meX,meY:meY});
+    */
     wx.request({
       url:serverPathSD+"wechatApplet/navToDestination",
       data:{meX:meX,meY:meY,scenicPlaceX:scenicPlace.data.x,scenicPlaceY:scenicPlace.data.y},
@@ -281,11 +305,57 @@ Page({
       },
       success: function (res) {
         let data=res.data;
-        scenicPlace.setData({roadStageList:data.roadStageList});
+        console.log(data.roadStageList[0])
+        scenicPlace.initRoadStageNavList(data.roadStageList);
         scenicPlace.setData({navFlag:true});
         scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
       }
     })
+  },
+  initMinDistanceStage:function(){
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    //let meX=1250;
+    //let meY=580;
+    let minDistance=99999999;
+    let nearX;
+    let nearY;
+    let roadStageList=scenicPlace.data.roadStageList;
+    for(var i=0;i<roadStageList.length;i++){
+      var roadStage=roadStageList[i];
+      if(roadStage.frontThrough){
+        let chaX=Math.abs(meX-roadStage.backX);
+        let chaY=Math.abs(meY-roadStage.backY);
+        let distance=Math.sqrt(chaX*chaX+chaY*chaY);
+        if(distance<minDistance){
+          minDistance=distance;
+          nearX=roadStage.backX;
+          nearY=roadStage.backY;
+        }
+      }
+    }
+    for(var i=0;i<roadStageList.length;i++){
+      var roadStage=roadStageList[i];
+      if(roadStage.backThrough){
+        let chaX=Math.abs(meX-roadStage.frontX);
+        let chaY=Math.abs(meY-roadStage.frontY);
+        let distance=Math.sqrt(chaX*chaX+chaY*chaY);
+        if(distance<minDistance){
+          minDistance=distance;
+          nearX=roadStage.frontX;
+          nearY=roadStage.frontY;
+        }
+      }
+    }
+    //console.log("minDistance==="+minDistance+",nearX="+nearX+",nearY="+nearY);
+    scenicPlace.setData({nearX:nearX,nearY:nearY});
+  },
+  initRoadStageNavList:function(roadStageList){
+    let roadStageNavList=[];
+    for(var i=0;i<roadStageList.length;i++){
+      roadStageNavList.push(roadStageList[i]);
+    }
+    scenicPlace.setData({roadStageNavList:roadStageNavList});
   },
   drawNavRoadLine:function(updateFlag){
     let sceDisCanvas=scenicPlace.data.sceDisCanvas;
@@ -297,15 +367,15 @@ Page({
     let x2=568;
     let y2=65;
     */
-    let roadStageList=scenicPlace.data.roadStageList;
+    let roadStageNavList=scenicPlace.data.roadStageNavList;
     //scenicPlace.setRoadStageLocation(sceDisCanvas,962,385,568,65);
     //scenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
-    for(let i=0;i<roadStageList.length;i++){
+    for(let i=0;i<roadStageNavList.length;i++){
       //if(i==4)
         //break;
       //console.log("==="+JSON.stringify(roadStageList[i]))
       //console.log("x1="+roadStageList[i].backX+",y1="+roadStageList[i].backY+",x2="+roadStageList[i].frontX+",y2="+roadStageList[i].frontY)
-      scenicPlace.setRoadStageLocation(sceDisCanvas,roadStageList[i].backX,roadStageList[i].backY,roadStageList[i].frontX,roadStageList[i].frontY);
+      scenicPlace.setRoadStageLocation(sceDisCanvas,roadStageNavList[i].backX,roadStageNavList[i].backY,roadStageNavList[i].frontX,roadStageNavList[i].frontY);
     }
     //scenicPlace.setRoadStageLocation(sceDisCanvas,1097.00,572.00,1181.00,533);
     sceDisCanvas.stroke() //画出当前路径的边框
@@ -315,10 +385,32 @@ Page({
       clearInterval(updateNavLineInterval);
       updateNavLineInterval=setInterval(() => {
         //scenicPlace.drawNavRoadLine(true);
-        if(scenicPlace.checkSceDisImage())
-          scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+        if(scenicPlace.checkSceDisImage()){
+          let nearX=scenicPlace.data.nearX;
+          let nearY=scenicPlace.data.nearY;
+          let nearRoadStage=scenicPlace.data.roadStageNavList[0];
+          //console.log("nearRoadStage="+nearRoadStage.frontX);
+          if(nearX==nearRoadStage.frontX&nearY==nearRoadStage.frontY){
+            console.log("111111111");
+            scenicPlace.initMinDistanceStage();
+            scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+            scenicPlace.changeMeLocation();
+          }
+          else{
+            console.log("2222222222");
+            scenicPlace.navToDestination();
+          }
+        }
       }, "5000");
     }
+  },
+  changeMeLocation:function(){
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    meX-=2;
+    //meY++;
+    console.log("meX="+meX+",meY="+meY);
+    scenicPlace.setData({meX:meX,meY:meY});
   },
   setRoadStageLocation:function(sceDisCanvas,x1,y1,x2,y2){
     let sceDisCanvasStyleWidth=scenicPlace.data.sceDisCanvasStyleWidth;
