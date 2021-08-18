@@ -3,13 +3,14 @@ var scenicPlace;
 var serverPathCQ;
 var serverPathSD;
 var serverPath;
+var updateNavLineInterval;
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    navFlag:false
   },
 
   /**
@@ -24,6 +25,7 @@ Page({
       }
     })
 
+    /*
     options.id=3;
     options.name="岳家庄";
     options.x=300;
@@ -31,6 +33,7 @@ Page({
     options.picUrl="/ElectronicGuide/upload/ScenicPlacePic/1628583735118.png";
     options.picWidth=30;
     options.picHeight=30;
+    */
 
     scenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
@@ -179,7 +182,7 @@ Page({
     sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
     
     if(scenicPlace.data.navFlag)
-      scenicPlace.drawNavRoadLine();
+      scenicPlace.drawNavRoadLine(false);
     else
       scenicPlace.drawSceDisCanvas();
   },
@@ -238,6 +241,69 @@ Page({
   },
   scrollCanvas:function(e){
     scenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
+  },
+  navToDestination:function(){
+    //let meX=scenicPlace.data.meX;
+    //let meY=scenicPlace.data.meY;
+    let meX=1250;
+    let meY=580;
+    console.log(meX+","+meY);
+    scenicPlace.setData({meX:meX,meY:meY});
+    wx.request({
+      url:serverPathSD+"wechatApplet/navToDestination",
+      data:{meX:meX,meY:meY,scenicPlaceX:scenicPlace.data.x,scenicPlaceY:scenicPlace.data.y},
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      success: function (res) {
+        let data=res.data;
+        scenicPlace.setData({roadStageList:data.roadStageList});
+        scenicPlace.setData({navFlag:true});
+        scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+      }
+    })
+  },
+  drawNavRoadLine:function(updateFlag){
+    let sceDisCanvas=scenicPlace.data.sceDisCanvas;
+    sceDisCanvas.beginPath(); //创建一条路径   
+    sceDisCanvas.setStrokeStyle('red');   //设置边框为红色
+    /*
+    let x1=scenicPlace.data.meX;
+    let y1=scenicPlace.data.meY;
+    let x2=568;
+    let y2=65;
+    */
+    let roadStageList=scenicPlace.data.roadStageList;
+    //scenicPlace.setRoadStageLocation(sceDisCanvas,962,385,568,65);
+    //scenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
+    for(let i=0;i<roadStageList.length;i++){
+      //if(i==4)
+        //break;
+      //console.log("==="+JSON.stringify(roadStageList[i]))
+      //console.log("x1="+roadStageList[i].backX+",y1="+roadStageList[i].backY+",x2="+roadStageList[i].frontX+",y2="+roadStageList[i].frontY)
+      scenicPlace.setRoadStageLocation(sceDisCanvas,roadStageList[i].backX,roadStageList[i].backY,roadStageList[i].frontX,roadStageList[i].frontY);
+    }
+    //scenicPlace.setRoadStageLocation(sceDisCanvas,1097.00,572.00,1181.00,533);
+    sceDisCanvas.stroke() //画出当前路径的边框
+    sceDisCanvas.draw();
+
+    if(!updateFlag){
+      clearInterval(updateNavLineInterval);
+      updateNavLineInterval=setInterval(() => {
+        scenicPlace.drawNavRoadLine(true);
+      }, "5000");
+    }
+  },
+  setRoadStageLocation:function(sceDisCanvas,x1,y1,x2,y2){
+    let sceDisCanvasStyleWidth=scenicPlace.data.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=scenicPlace.data.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=scenicPlace.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicPlace.data.sceDisCanvasMinHeight;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    sceDisCanvas.moveTo(x1*widthScale,sceDisCanvasStyleHeight-y1*heightScale) //描述路径的起点为手指触摸的x轴和y轴
+    sceDisCanvas.lineTo(x2*widthScale,sceDisCanvasStyleHeight-y2*heightScale) //绘制一条直线，终点坐标为手指触摸结束后的x轴和y轴
   },
 
   /**
