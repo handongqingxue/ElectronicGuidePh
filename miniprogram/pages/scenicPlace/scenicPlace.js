@@ -111,6 +111,14 @@ Page({
       }
     })
   },
+  checkSceDisImage:function(){
+    if(scenicPlace.data.sceDisCanvasImagePath===undefined){
+      return false;
+    }
+    else{
+      return true;
+    }
+  },
   initSceDisCanvas:function(path,reSizeFlag){
     let scenicPlaceData=scenicPlace.data;
     let sceDisCanvasImageX=scenicPlaceData.sceDisCanvasImageX;
@@ -122,7 +130,7 @@ Page({
     //console.log("sceDisCanvasImageX="+sceDisCanvasImageX+",sceDisCanvasImageY="+sceDisCanvasImageY+",sceDisCanvasStyleWidth="+sceDisCanvasStyleWidth+",sceDisCanvasStyleHeight="+sceDisCanvasStyleHeight)
     let sceDisCanvas=null;
     if(reSizeFlag){
-      scenicPlace.clearSceDisCanvas();
+      //scenicPlace.clearSceDisCanvas();
       sceDisCanvas=scenicPlace.data.sceDisCanvas;
     }
     else{
@@ -134,16 +142,31 @@ Page({
     scenicPlace.getScenicPlaceImageInfo()
   },
   getScenicPlaceImageInfo:function(){
-    wx.getImageInfo({
-      //src: "https://localhost"+scenicPlace.picUrl,
-      src: "https://www.qrcodesy.com"+scenicPlace.data.picUrl,
-      success: function (res){
-        scenicPlace.drawScenicPlace(scenicPlace.data.name,res.path,scenicPlace.data.x,scenicPlace.data.y,scenicPlace.data.picWidth,scenicPlace.data.picHeight);
-      },
-      fail: function(res){
-        scenicPlace.setData({toastMsg:JSON.stringify(res)});
-      }
-    })
+    if(scenicPlace.checkScenicPlaceImage()){
+      console.log("缓存里有景点图片了...")
+      scenicPlace.drawScenicPlace(scenicPlace.data.name,scenicPlace.data.scenicPlaceCanvasImagePath,scenicPlace.data.x,scenicPlace.data.y,scenicPlace.data.picWidth,scenicPlace.data.picHeight);
+    }
+    else{
+      wx.getImageInfo({
+        //src: "https://localhost"+scenicPlace.picUrl,
+        src: "https://www.qrcodesy.com"+scenicPlace.data.picUrl,
+        success: function (res){
+          scenicPlace.setData({scenicPlaceCanvasImagePath:res.path})
+          scenicPlace.drawScenicPlace(scenicPlace.data.name,res.path,scenicPlace.data.x,scenicPlace.data.y,scenicPlace.data.picWidth,scenicPlace.data.picHeight);
+        },
+        fail: function(res){
+          scenicPlace.setData({toastMsg:JSON.stringify(res)});
+        }
+      })
+    }
+  },
+  checkScenicPlaceImage:function(){
+    if(scenicPlace.data.scenicPlaceCanvasImagePath===undefined){
+      return false;
+    }
+    else{
+      return true;
+    }
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     let sceDisCanvas=scenicPlace.data.sceDisCanvas;
@@ -291,7 +314,9 @@ Page({
     if(!updateFlag){
       clearInterval(updateNavLineInterval);
       updateNavLineInterval=setInterval(() => {
-        scenicPlace.drawNavRoadLine(true);
+        //scenicPlace.drawNavRoadLine(true);
+        if(scenicPlace.checkSceDisImage())
+          scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
       }, "5000");
     }
   },
