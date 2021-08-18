@@ -106,7 +106,8 @@ Page({
           scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
           scenicPlace.selectRoadStageList();
 
-          scenicPlace.setData({meX:1250,meY:580});
+          //scenicPlace.setData({meX:1250,meY:580});
+          scenicPlace.setData({meX:1154,meY:580});
         }
       },
       fail:function(res){
@@ -305,10 +306,12 @@ Page({
       },
       success: function (res) {
         let data=res.data;
-        console.log(data.roadStageList[0])
-        scenicPlace.initRoadStageNavList(data.roadStageList);
-        scenicPlace.setData({navFlag:true});
-        scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+        if(data.roadStageList!=null){
+          console.log(data.roadStageList[0])
+          scenicPlace.initRoadStageNavList(data.roadStageList);
+          scenicPlace.setData({navFlag:true});
+          scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+        }
       }
     })
   },
@@ -320,6 +323,7 @@ Page({
     let minDistance=99999999;
     let nearX;
     let nearY;
+    console.log("initMinDistanceStage:meX+"+meX+",meY="+meY);
     let roadStageList=scenicPlace.data.roadStageList;
     for(var i=0;i<roadStageList.length;i++){
       var roadStage=roadStageList[i];
@@ -351,9 +355,24 @@ Page({
     scenicPlace.setData({nearX:nearX,nearY:nearY});
   },
   initRoadStageNavList:function(roadStageList){
+    scenicPlace.setData({nearRoadStage:roadStageList[0]});
     let roadStageNavList=[];
     for(var i=0;i<roadStageList.length;i++){
       roadStageNavList.push(roadStageList[i]);
+    }
+    scenicPlace.setData({roadStageNavList:roadStageNavList});
+  },
+  initMeToSPRoadStageNavList:function(){
+    let roadStageNavList=[];
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    let nearX=scenicPlace.data.nearX;
+    let nearY=scenicPlace.data.nearY;
+    roadStageNavList.push({backX:meX,backY:meY,frontX:nearX,frontY:nearY});
+    let preRoadStageNavList=scenicPlace.data.roadStageNavList;
+    console.log("----"+preRoadStageNavList.length);
+    for(var i=1;i<preRoadStageNavList.length;i++){
+      roadStageNavList.push(preRoadStageNavList[i]);
     }
     scenicPlace.setData({roadStageNavList:roadStageNavList});
   },
@@ -370,6 +389,7 @@ Page({
     let roadStageNavList=scenicPlace.data.roadStageNavList;
     //scenicPlace.setRoadStageLocation(sceDisCanvas,962,385,568,65);
     //scenicPlace.setRoadStageLocation(sceDisCanvas,x1,y1,roadStageList[0].backX,roadStageList[0].backY);
+    console.log("导航线条数="+roadStageNavList.length);
     for(let i=0;i<roadStageNavList.length;i++){
       //if(i==4)
         //break;
@@ -388,11 +408,12 @@ Page({
         if(scenicPlace.checkSceDisImage()){
           let nearX=scenicPlace.data.nearX;
           let nearY=scenicPlace.data.nearY;
-          let nearRoadStage=scenicPlace.data.roadStageNavList[0];
+          let nearRoadStage=scenicPlace.data.nearRoadStage;
           //console.log("nearRoadStage="+nearRoadStage.frontX);
           if(nearX==nearRoadStage.frontX&nearY==nearRoadStage.frontY){
             console.log("111111111");
             scenicPlace.initMinDistanceStage();
+            scenicPlace.initMeToSPRoadStageNavList();
             scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
             scenicPlace.changeMeLocation();
           }
@@ -407,9 +428,11 @@ Page({
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
-    meX-=2;
+    meX-=12;
     //meY++;
-    console.log("meX="+meX+",meY="+meY);
+    //if(meX==1142)
+      //meX=1154;
+    console.log("changeMeLocation:meX="+meX+",meY="+meY);
     scenicPlace.setData({meX:meX,meY:meY});
   },
   setRoadStageLocation:function(sceDisCanvas,x1,y1,x2,y2){
