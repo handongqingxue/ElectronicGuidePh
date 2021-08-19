@@ -106,8 +106,8 @@ Page({
           scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
           scenicPlace.selectRoadStageList();
 
-          //scenicPlace.setData({meX:1250,meY:580});
-          scenicPlace.setData({meX:1154,meY:580});
+          scenicPlace.setData({meX:1250,meY:580});
+          //scenicPlace.setData({meX:1154,meY:580});
         }
       },
       fail:function(res){
@@ -220,15 +220,18 @@ Page({
     let sceDisCanvasMinHeight=scenicPlace.data.sceDisCanvasMinHeight;
     let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
     let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
-    let x=(scenicPlace.data.longitude-scenicPlace.data.sceDis.longitudeStart)/scenicPlace.data.locationWidthScale;
-    let y=(scenicPlace.data.latitude-scenicPlace.data.sceDis.latitudeStart)/scenicPlace.data.locationHeightScale;
+    //let x=(scenicPlace.data.longitude-scenicPlace.data.sceDis.longitudeStart)/scenicPlace.data.locationWidthScale;
+    //let y=(scenicPlace.data.latitude-scenicPlace.data.sceDis.latitudeStart)/scenicPlace.data.locationHeightScale;
+    let x=scenicPlace.data.meX;
+    let y=scenicPlace.data.meY;
     console.log(x+","+y);
     //scenicPlace.setData({meX:x,meY:y});
     let sceDisCanvas=scenicPlace.data.sceDisCanvas;
     sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
     
-    if(scenicPlace.data.navFlag)
+    if(scenicPlace.data.navFlag){
       scenicPlace.drawNavRoadLine(false);
+    }
     else
       scenicPlace.drawSceDisCanvas();
   },
@@ -306,12 +309,13 @@ Page({
       },
       success: function (res) {
         let data=res.data;
+        console.log("roadStageList==="+data.roadStageList);
         if(data.roadStageList!=null){
-          console.log(data.roadStageList[0])
+          console.log("重新加载导航线...")
           scenicPlace.initRoadStageNavList(data.roadStageList);
-          scenicPlace.setData({navFlag:true});
-          scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
         }
+        scenicPlace.setData({navFlag:true});
+        scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
       }
     })
   },
@@ -406,16 +410,16 @@ Page({
       updateNavLineInterval=setInterval(() => {
         //scenicPlace.drawNavRoadLine(true);
         if(scenicPlace.checkSceDisImage()){
+          scenicPlace.changeMeLocation();
+          scenicPlace.initMinDistanceStage();
           let nearX=scenicPlace.data.nearX;
           let nearY=scenicPlace.data.nearY;
           let nearRoadStage=scenicPlace.data.nearRoadStage;
           //console.log("nearRoadStage="+nearRoadStage.frontX);
           if(nearX==nearRoadStage.frontX&nearY==nearRoadStage.frontY){
             console.log("111111111");
-            scenicPlace.initMinDistanceStage();
             scenicPlace.initMeToSPRoadStageNavList();
             scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
-            scenicPlace.changeMeLocation();
           }
           else{
             console.log("2222222222");
@@ -428,10 +432,12 @@ Page({
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
-    meX-=12;
-    //meY++;
-    //if(meX==1142)
-      //meX=1154;
+    meX-=3;
+    meY-=3;
+    if(meX<=1166)
+      meX+=3;
+    if(meY<=496)
+      meY+=3;
     console.log("changeMeLocation:meX="+meX+",meY="+meY);
     scenicPlace.setData({meX:meX,meY:meY});
   },
