@@ -1,9 +1,11 @@
 // miniprogram/pages/scenicPlace/scenicPlace.js
+//播放音频参考链接:https://www.jb51.net/article/96336.htm
 var scenicPlace;
 var serverPathCQ;
 var serverPathSD;
 var serverPath;
 var updateNavLineInterval;
+var simpleAudio;
 Page({
 
   /**
@@ -53,6 +55,24 @@ Page({
    */
   onReady: function () {
     scenicPlace.selectSceDisById();
+    scenicPlace.simpleAudio=wx.createAudioContext('simple_audio');
+  },
+  funplay: function(e){
+    let typeFlag=e;
+    console.log("audio play"+JSON.stringify(e));
+  },
+  funpause: function(){
+    console.log("audio pause");
+  },
+  funtimeupdate: function(u){
+    //console.log(u.detail.currentTime);
+    //console.log(u.detail.duration);
+  },
+  funended: function(){
+    console.log("audio end");
+  },
+  funerror: function(u){
+    console.log(u.detail.errMsg);
   },
   selectRoadStageList:function(){
     wx.request({
@@ -292,6 +312,8 @@ Page({
     scenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
   navToDestination:function(){
+    scenicPlace.simpleAudio.play();
+
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
     /*
@@ -432,12 +454,14 @@ Page({
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
+    /*
     meX-=3;
     meY-=3;
     if(meX<=1166)
       meX+=3;
     if(meY<=496)
       meY+=3;
+      */
     console.log("changeMeLocation:meX="+meX+",meY="+meY);
     scenicPlace.setData({meX:meX,meY:meY});
   },
