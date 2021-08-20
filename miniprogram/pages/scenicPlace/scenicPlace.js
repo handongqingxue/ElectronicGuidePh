@@ -8,6 +8,7 @@ var updateNavLineInterval;
 var detailAudio;
 var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
+var detailAudioOpenFlag=false;
 Page({
 
   /**
@@ -199,7 +200,7 @@ Page({
   },
   getScenicPlaceImageInfo:function(scenicPlaceItem){
     wx.getImageInfo({
-      src: "https://www.qrcodesy.com"+scenicPlaceItem.picUrl,
+      src: "https://"+scenicPlace.data.sceDis.serverName+scenicPlaceItem.picUrl,
       success: function (res){
         //console.log("res.path="+res.path);
         scenicPlaceItem.imageSrc=res.path;
@@ -347,8 +348,6 @@ Page({
     scenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
   navToDestination:function(){
-    scenicPlace.detailAudio.play();
-
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
     /*
@@ -482,9 +481,46 @@ Page({
             console.log("2222222222");
             scenicPlace.navToDestination();
           }
+          scenicPlace.checkNearScenicPlace();
         }
       }, "5000");
     }
+  },
+  checkNearScenicPlace:function(){
+    if(detailAudioOpenFlag)
+      return false;
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    let scenicPlaceList=scenicPlace.data.scenicPlaceList;
+    let nearScenicPlace=scenicPlace.data.nearScenicPlace;
+    if(nearScenicPlace==null){
+      for(var i=0;i<scenicPlaceList.length;i++){
+        var scenicPlaceItem=scenicPlaceList[i];
+        let chaX=Math.abs(meX-scenicPlaceItem.x);
+        let chaY=Math.abs(meY-scenicPlaceItem.y);
+        let distance=Math.sqrt(chaX*chaX+chaY*chaY);
+        if(distance<=scenicPlaceItem.detailIntroScope){
+          console.log("detailIntroScope==="+scenicPlaceItem.detailIntroScope)
+          scenicPlace.setData({nearScenicPlace:scenicPlaceItem});
+          detailAudioOpenFlag=true;
+          break;
+        }
+      }
+    }
+
+    if(detailAudioOpenFlag)
+      scenicPlace.openDetailAudioSrc(true);
+  },
+  openDetailAudioSrc:function(openFlag){
+    if(openFlag){
+      scenicPlace.setData({detailAudioSrc:"https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuide/upload/ScenicPlaceVoice/202108190001.mp3"});
+      scenicPlace.detailAudio.play();
+    }
+    else{
+      scenicPlace.setData({detailAudioSrc:null});
+      scenicPlace.detailAudio.seek(0);
+    }
+    detailAudioOpenFlag=openFlag;
   },
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
