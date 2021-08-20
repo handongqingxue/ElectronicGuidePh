@@ -6,6 +6,7 @@ var serverPathSD;
 var serverPath;
 var updateNavLineInterval;
 var detailAudio;
+var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
 Page({
 
@@ -97,12 +98,14 @@ Page({
       success: function (res) {
         let data=res.data;
         let scenicPlaceList=data.scenicPlaceList;
+        scenicPlace.setData({scenicPlaceLength:scenicPlaceList.length});
+        scenicPlaceImageCount=0;
         canvasScenicPlaceCount=0;
         for(var i=0;i<scenicPlaceList.length;i++){
           scenicPlace.getScenicPlaceImageInfo(scenicPlaceList[i]);
           //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
         }
-        scenicPlace.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
+        scenicPlace.setData({scenicPlaceList:scenicPlaceList});
       }
     })
   },
@@ -155,13 +158,8 @@ Page({
           });
           serverPathSD="https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuideSD/";
           scenicPlace.jiSuanLocationScale(data.sceDis);
-          scenicPlace.selectScenicPlaceList();
-          scenicPlace.selectRoadStageList();
-
-          setTimeout(() => {
-            
           scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
-          }, 8000);
+          scenicPlace.selectRoadStageList();
 
           scenicPlace.setData({meX:1250,meY:580});
           //scenicPlace.setData({meX:1154,meY:580});
@@ -184,7 +182,7 @@ Page({
       src: src,
       success: function (res){
         scenicPlace.setData({sceDisCanvasImagePath:res.path})
-        scenicPlace.initSceDisCanvas(res.path,false);
+        scenicPlace.selectScenicPlaceList();
       },
       fail: function(res){
         scenicPlace.setData({toastMsg:JSON.stringify(res)});
@@ -205,6 +203,10 @@ Page({
       success: function (res){
         //console.log("res.path="+res.path);
         scenicPlaceItem.imageSrc=res.path;
+        scenicPlaceImageCount++;
+        let scenicPlaceLength=scenicPlace.data.scenicPlaceLength;
+        if(scenicPlaceImageCount==scenicPlaceLength)
+          scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,false);
       },
       fail: function(res){
 
