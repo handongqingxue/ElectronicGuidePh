@@ -1,5 +1,5 @@
 <!--miniprogram/pages/scenicPlace/scenicPlace.wxml-->
-<audio id="simple_audio"  src="https://www.qrcodesy.com/ElectronicGuide/upload/ScenicPlaceVoice/202108190001.mp3" controls loop bindplay="funplay" bindpause="funpause" bindtimeupdate="funtimeupdate" bindended="funended" binderror="funerror"></audio>
+<audio id="detail_audio"  src="https://www.qrcodesy.com/ElectronicGuide/upload/ScenicPlaceVoice/202108190001.mp3" controls loop bindplay="funPlay" bindpause="funPause" bindtimeupdate="funTimeupdate" bindended="funEnded" binderror="funError"></audio>
 <scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;margin-top:300px;" bindscroll="scrollCanvas">
     <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;">
     </canvas>

@@ -5,7 +5,8 @@ var serverPathCQ;
 var serverPathSD;
 var serverPath;
 var updateNavLineInterval;
-var simpleAudio;
+var detailAudio;
+var canvasScenicPlaceCount;
 Page({
 
   /**
@@ -55,24 +56,55 @@ Page({
    */
   onReady: function () {
     scenicPlace.selectSceDisById();
-    scenicPlace.simpleAudio=wx.createAudioContext('simple_audio');
+    scenicPlace.detailAudio=wx.createAudioContext('detail_audio');
   },
-  funplay: function(e){
-    let typeFlag=e;
-    console.log("audio play"+JSON.stringify(e));
+  funPlay: function(e){
+    let audioId=e.currentTarget.id;
+    if(audioId=="detail_audio")
+      console.log("audio play");
   },
-  funpause: function(){
-    console.log("audio pause");
+  funPause: function(e){
+    let audioId=e.currentTarget.id;
+    if(audioId=="detail_audio")
+      console.log("audio pause");
   },
-  funtimeupdate: function(u){
-    //console.log(u.detail.currentTime);
-    //console.log(u.detail.duration);
+  funTimeupdate: function(e){
+    let audioId=e.currentTarget.id;
+    if(audioId=="detail_audio"){
+      console.log(e.detail.currentTime);
+      console.log(e.detail.duration);
+    }
   },
-  funended: function(){
-    console.log("audio end");
+  funEnded: function(e){
+    let audioId=e.currentTarget.id;
+    if(audioId=="detail_audio"){
+      console.log("audio end");
+    }
   },
-  funerror: function(u){
-    console.log(u.detail.errMsg);
+  funError: function(e){
+    let audioId=e.currentTarget.id;
+    if(audioId=="detail_audio"){
+      console.log(e.detail.errMsg);
+    }
+  },
+  selectScenicPlaceList:function(){
+    wx.request({
+      url:serverPathSD+"wechatApplet/selectScenicPlaceList",
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      success: function (res) {
+        let data=res.data;
+        let scenicPlaceList=data.scenicPlaceList;
+        canvasScenicPlaceCount=0;
+        for(var i=0;i<scenicPlaceList.length;i++){
+          scenicPlace.getScenicPlaceImageInfo(scenicPlaceList[i]);
+          //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
+        }
+        scenicPlace.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
+      }
+    })
   },
   selectRoadStageList:function(){
     wx.request({
@@ -123,8 +155,13 @@ Page({
           });
           serverPathSD="https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuideSD/";
           scenicPlace.jiSuanLocationScale(data.sceDis);
-          scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
+          scenicPlace.selectScenicPlaceList();
           scenicPlace.selectRoadStageList();
+
+          setTimeout(() => {
+            
+          scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
+          }, 8000);
 
           scenicPlace.setData({meX:1250,meY:580});
           //scenicPlace.setData({meX:1154,meY:580});
@@ -162,6 +199,18 @@ Page({
       return true;
     }
   },
+  getScenicPlaceImageInfo:function(scenicPlaceItem){
+    wx.getImageInfo({
+      src: "https://www.qrcodesy.com"+scenicPlaceItem.picUrl,
+      success: function (res){
+        //console.log("res.path="+res.path);
+        scenicPlaceItem.imageSrc=res.path;
+      },
+      fail: function(res){
+
+      }
+    })
+  },
   initSceDisCanvas:function(path,reSizeFlag){
     let scenicPlaceData=scenicPlace.data;
     let sceDisCanvasImageX=scenicPlaceData.sceDisCanvasImageX;
@@ -182,36 +231,16 @@ Page({
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
 
-    scenicPlace.getScenicPlaceImageInfo()
-  },
-  getScenicPlaceImageInfo:function(){
-    if(scenicPlace.checkScenicPlaceImage()){
-      console.log("缓存里有景点图片了...")
-      scenicPlace.drawScenicPlace(scenicPlace.data.name,scenicPlace.data.scenicPlaceCanvasImagePath,scenicPlace.data.x,scenicPlace.data.y,scenicPlace.data.picWidth,scenicPlace.data.picHeight);
-    }
-    else{
-      wx.getImageInfo({
-        //src: "https://localhost"+scenicPlace.picUrl,
-        src: "https://www.qrcodesy.com"+scenicPlace.data.picUrl,
-        success: function (res){
-          scenicPlace.setData({scenicPlaceCanvasImagePath:res.path})
-          scenicPlace.drawScenicPlace(scenicPlace.data.name,res.path,scenicPlace.data.x,scenicPlace.data.y,scenicPlace.data.picWidth,scenicPlace.data.picHeight);
-        },
-        fail: function(res){
-          scenicPlace.setData({toastMsg:JSON.stringify(res)});
-        }
-      })
-    }
-  },
-  checkScenicPlaceImage:function(){
-    if(scenicPlace.data.scenicPlaceCanvasImagePath===undefined){
-      return false;
-    }
-    else{
-      return true;
+    canvasScenicPlaceCount=0;
+    let scenicPlaceList=scenicPlace.data.scenicPlaceList;
+    for(var i=0;i<scenicPlaceList.length;i++){
+      let scenicPlaceItem=scenicPlaceList[i];
+      scenicPlace.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
+      //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
     }
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
+    canvasScenicPlaceCount++;
     let sceDisCanvas=scenicPlace.data.sceDisCanvas;
     let sceDisCanvasStyleWidth=scenicPlace.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicPlace.data.sceDisCanvasStyleHeight;
@@ -229,7 +258,11 @@ Page({
     //小程序绘制文字默认以文字中心为原点，而h5页面是以文字左下角为原点。这里不用重新计算
     sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
-    scenicPlace.drawMeLocation();
+    //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
+    let scenicPlaceLength=scenicPlace.data.scenicPlaceLength;
+    if(canvasScenicPlaceCount==scenicPlaceLength){
+      scenicPlace.drawMeLocation();
+    }
   },
   drawMeLocation:function(){
     let picWidth=34;
@@ -312,7 +345,7 @@ Page({
     scenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
   navToDestination:function(){
-    scenicPlace.simpleAudio.play();
+    scenicPlace.detailAudio.play();
 
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
@@ -454,9 +487,9 @@ Page({
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
-    /*
     meX-=3;
     meY-=3;
+    /*
     if(meX<=1166)
       meX+=3;
     if(meY<=496)
