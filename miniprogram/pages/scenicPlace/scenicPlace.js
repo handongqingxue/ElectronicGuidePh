@@ -8,7 +8,7 @@ var updateNavLineInterval;
 var detailAudio;
 var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
-var detailAudioOpenFlag=false;
+var detailAudioStateFlag="end";
 Page({
 
   /**
@@ -62,24 +62,29 @@ Page({
   },
   funPlay: function(e){
     let audioId=e.currentTarget.id;
-    if(audioId=="detail_audio")
+    if(audioId=="detail_audio"){
       console.log("audio play");
+      //detailAudioStateFlag="play";
+    }
   },
   funPause: function(e){
     let audioId=e.currentTarget.id;
-    if(audioId=="detail_audio")
+    if(audioId=="detail_audio"){
       console.log("audio pause");
+      //detailAudioStateFlag="pause";
+    }
   },
   funTimeupdate: function(e){
     let audioId=e.currentTarget.id;
     if(audioId=="detail_audio"){
       console.log(e.detail.currentTime);
-      console.log(e.detail.duration);
+      //console.log(e.detail.duration);
     }
   },
   funEnded: function(e){
     let audioId=e.currentTarget.id;
     if(audioId=="detail_audio"){
+      //scenicPlace.optionDetailAudioSrc("end");
       console.log("audio end");
     }
   },
@@ -481,19 +486,18 @@ Page({
             console.log("2222222222");
             scenicPlace.navToDestination();
           }
-          scenicPlace.checkNearScenicPlace();
+
+          if(scenicPlace.checkIfOverDetailScope())
+            scenicPlace.checkNearScenicPlace();
         }
       }, "5000");
     }
   },
   checkNearScenicPlace:function(){
-    if(detailAudioOpenFlag)
-      return false;
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
     let scenicPlaceList=scenicPlace.data.scenicPlaceList;
-    let nearScenicPlace=scenicPlace.data.nearScenicPlace;
-    if(nearScenicPlace==null){
+    if(detailAudioStateFlag=="pause"||detailAudioStateFlag=="end"){
       for(var i=0;i<scenicPlaceList.length;i++){
         var scenicPlaceItem=scenicPlaceList[i];
         let chaX=Math.abs(meX-scenicPlaceItem.x);
@@ -502,25 +506,47 @@ Page({
         if(distance<=scenicPlaceItem.detailIntroScope){
           console.log("detailIntroScope==="+scenicPlaceItem.detailIntroScope)
           scenicPlace.setData({nearScenicPlace:scenicPlaceItem});
-          detailAudioOpenFlag=true;
+          scenicPlace.optionDetailAudioSrc("play");
           break;
         }
       }
     }
-
-    if(detailAudioOpenFlag)
-      scenicPlace.openDetailAudioSrc(true);
   },
-  openDetailAudioSrc:function(openFlag){
-    if(openFlag){
-      scenicPlace.setData({detailAudioSrc:"https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuide/upload/ScenicPlaceVoice/202108190001.mp3"});
+  checkIfOverDetailScope:function(){
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    let nearScenicPlace=scenicPlace.data.nearScenicPlace;
+    if(nearScenicPlace==undefined||nearScenicPlace==null){
+      return true;
+    }
+    let chaX=Math.abs(meX-nearScenicPlace.x);
+    let chaY=Math.abs(meY-nearScenicPlace.y);
+    let distance=Math.sqrt(chaX*chaX+chaY*chaY);
+    if(distance>nearScenicPlace.detailIntroScope){
+      scenicPlace.optionDetailAudioSrc("pause");
+      return true;
+    }
+    else
+      return false;
+  },
+  optionDetailAudioSrc:function(stateFlag){
+    if(stateFlag=="play"){
+      console.log("播放......")
+      let nearScenicPlace=scenicPlace.data.nearScenicPlace;
+      scenicPlace.setData({detailAudioSrc:"https://"+scenicPlace.data.sceDis.serverName+nearScenicPlace.detailIntroVoiceUrl});
+      //scenicPlace.setData({detailAudioSrc:"https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuide/upload/ScenicPlaceVoice/202108190001.mp3"});
       scenicPlace.detailAudio.play();
     }
-    else{
+    else if(stateFlag=="pause"){
+      console.log("暂停......")
+      scenicPlace.detailAudio.pause();
+    }
+    else if(stateFlag=="end"){
+      console.log("结束......")
       scenicPlace.setData({detailAudioSrc:null});
       scenicPlace.detailAudio.seek(0);
     }
-    detailAudioOpenFlag=openFlag;
+    detailAudioStateFlag=stateFlag;
   },
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
