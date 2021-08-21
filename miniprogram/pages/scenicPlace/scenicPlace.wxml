@@ -1,6 +1,5 @@
 <!--miniprogram/pages/scenicPlace/scenicPlace.wxml-->
-<audio id="detail_audio"  src="{{detailAudioSrc}}" controls loop bindplay="funPlay" bindpause="funPause" bindtimeupdate="funTimeupdate" bindended="funEnded" binderror="funError"></audio>
-<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;margin-top:300px;" bindscroll="scrollCanvas">
+<scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;" bindscroll="scrollCanvas">
     <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;">
     </canvas>
 </scroll-view>
@@ -15,8 +14,9 @@
   <cover-view class="info_cv">
     <cover-view class="name_cv">{{name}}</cover-view>
     <cover-view class="but_group_cv">
-      <cover-view class="but_cv dh_but_cv" catchtap="navToDestination">导航</cover-view>
-      <cover-view class="but_cv dzdy_but_cv">电子导游</cover-view>
+      <cover-view class="but_cv off_but_cv" catchtap="navToDestination">导航</cover-view>
+      <cover-view class="but_cv dzdy_but_cv {{dzdyButState?'on_but_cv':'off_but_cv'}}" catchtap="openDZDYBut">电子导游</cover-view>
     </cover-view>
   </cover-view>
 </cover-view>
+<audio id="detail_audio" src="{{detailAudioSrc}}" controls loop bindplay="funPlay" bindpause="funPause" bindtimeupdate="funTimeupdate" bindended="funEnded" binderror="funError"></audio>

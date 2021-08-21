@@ -54,13 +54,18 @@
   border:1px solid #00f;
   border-radius:15px;
 }
-.info_cv .dh_but_cv{
-  color:#00f;
-  background-color:#fff;
-}
 .info_cv .dzdy_but_cv{
   margin-left:100px;
   margin-top:-32px;
+}
+.info_cv .on_but_cv{
   color:#fff;
   background-color:#00f;
+}
+.info_cv .off_but_cv{
+  color:#00f;
+  background-color:#fff;
+}
+.detail_audio{
+  display:none;
 }

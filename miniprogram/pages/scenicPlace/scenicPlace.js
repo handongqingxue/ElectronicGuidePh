@@ -9,13 +9,15 @@ var detailAudio;
 var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
 var detailAudioStateFlag="end";
+var currentTime=0;
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    navFlag:false
+    navFlag:false,
+    dzdyButState:true
   },
 
   /**
@@ -79,6 +81,7 @@ Page({
     if(audioId=="detail_audio"){
       console.log(e.detail.currentTime);
       //console.log(e.detail.duration);
+      currentTime=e.detail.currentTime;
     }
   },
   funEnded: function(e){
@@ -541,6 +544,11 @@ Page({
       console.log("暂停......")
       scenicPlace.detailAudio.pause();
     }
+    else if(stateFlag=="continue"){
+      console.log("继续......")
+      scenicPlace.detailAudio.play();
+      scenicPlace.detailAudio.seek(currentTime);
+    }
     else if(stateFlag=="end"){
       console.log("结束......")
       scenicPlace.setData({detailAudioSrc:null});
@@ -571,6 +579,17 @@ Page({
     let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
     sceDisCanvas.moveTo(x1*widthScale,sceDisCanvasStyleHeight-y1*heightScale) //描述路径的起点为手指触摸的x轴和y轴
     sceDisCanvas.lineTo(x2*widthScale,sceDisCanvasStyleHeight-y2*heightScale) //绘制一条直线，终点坐标为手指触摸结束后的x轴和y轴
+  },
+  openDZDYBut:function(){
+    let dzdyButState=scenicPlace.data.dzdyButState;
+    if(dzdyButState){
+      scenicPlace.setData({dzdyButState:false});
+      scenicPlace.optionDetailAudioSrc("pause");
+    }
+    else{
+      scenicPlace.setData({dzdyButState:true});
+      scenicPlace.optionDetailAudioSrc("continue");
+    }
   },
 
   /**
