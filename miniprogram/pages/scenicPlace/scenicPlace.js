@@ -604,11 +604,59 @@ Page({
     if(distance<=scenicPlace.data.arroundScope){
       console.log("已到景点范围内...");
       clearInterval(updateNavLineInterval);
-      return true;
+      scenicPlace.setData({arrivedFlag:true});
     }
     else{
-      return false;
+      scenicPlace.setData({arrivedFlag:false});
     }
+    scenicPlace.jiSuanWorkInfo();
+  },
+  jiSuanWorkInfo:function(){
+    let arrivedFlag=scenicPlace.data.arrivedFlag;
+    if(arrivedFlag){
+      let workDistance=scenicPlace.data.workDistance;
+      console.log("workDistance==="+workDistance);
+      scenicPlace.setData({workDistance:Math.floor(workDistance)});
+
+      let chaWorkTime=new Date().getTime()-scenicPlace.data.workTime;
+      console.log("chaWorkTime="+chaWorkTime)
+      let workTime=0;
+      if(chaWorkTime>=1000*60*60)
+        workTime=chaWorkTime/(1000*60*60)+"(h)";
+      else if(chaWorkTime>=1000*60)
+        workTime=chaWorkTime/(1000*60)+"(m)";
+      else if(chaWorkTime>=1000)
+        workTime=chaWorkTime/1000+"(s)";
+      scenicPlace.setData({workTime:workTime});
+
+      scenicPlace.showArrivedBgCV(true);
+    }
+    else{
+      let preMeX=scenicPlace.data.preMeX;
+      let preMeY=scenicPlace.data.preMeY;
+      let meX=scenicPlace.data.meX;
+      let meY=scenicPlace.data.meY;
+      if(preMeX==undefined||preMeY==undefined){
+        scenicPlace.setData({preMeX:meX,preMeY:meY});
+      }
+      else{
+        let chaX=Math.abs(meX-preMeX);
+        let chaY=Math.abs(meY-preMeY);
+        let distance=Math.sqrt(chaX*chaX+chaY*chaY);
+        let workDistance=scenicPlace.data.workDistance;
+        if(workDistance==undefined)
+          workDistance=0;
+        workDistance+=distance;
+        scenicPlace.setData({workDistance:workDistance});
+      }
+
+      let workTime=scenicPlace.data.workTime;
+      if(workTime==undefined)
+        scenicPlace.setData({workTime:new Date().getTime()});
+    }
+  },
+  showArrivedBgCV:function(showFlag){
+    scenicPlace.setData({showArrivedBgCVFlag:showFlag});
   },
 
   /**

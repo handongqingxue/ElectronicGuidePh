@@ -66,6 +66,18 @@
   color:#00f;
   background-color:#fff;
 }
+.arrived_bg_cv{
+  width:100%;height:150px;bottom:10px; position:fixed;
+}
+.show_abgcv{
+  display:block;
+}
+.hide_abgcv{
+  display:none;
+}
+.arrived_cv{
+  width:97%;height:150px;margin:0 auto;background-color: #fff;
+}
 .detail_audio{
   display:none;
 }

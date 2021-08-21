@@ -19,4 +19,9 @@
     </cover-view>
   </cover-view>
 </cover-view>
+<cover-view class="arrived_bg_cv {{showArrivedBgCVFlag?'show_abgcv':'hide_abgcv'}}">
+  <cover-view class="arrived_cv">
+    <cover-view>步行(m){{workDistance}}用时{{workTime}}</cover-view>
+  </cover-view>
+</cover-view>
 <audio id="detail_audio" src="{{detailAudioSrc}}" controls loop bindplay="funPlay" bindpause="funPause" bindtimeupdate="funTimeupdate" bindended="funEnded" binderror="funError"></audio>
