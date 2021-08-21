@@ -17,7 +17,8 @@ Page({
    */
   data: {
     navFlag:false,
-    dzdyButState:true
+    dzdyButState:true,
+    showArrivedBgCVFlag:true
   },
 
   /**
