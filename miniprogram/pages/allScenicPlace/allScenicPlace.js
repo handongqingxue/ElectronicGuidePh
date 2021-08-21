@@ -283,14 +283,14 @@ Page({
       if(x>=startX&x<=endX&y>=startY&y<=endY){
         console.log(scenicPlace.name+",x="+scenicPlace.x+",y="+scenicPlace.y);
         //allScenicPlace.navToDestination(scenicPlace.x,scenicPlace.y);
-        allScenicPlace.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight);
+        allScenicPlace.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight,scenicPlace.arroundScope);
       }
     }
   },
-  goScenicPlace:function(id,name,x,y,picUrl,picWidth,picHeight){
+  goScenicPlace:function(id,name,x,y,picUrl,picWidth,picHeight,arroundScope){
     //console.log(picUrl+","+x+","+y+","+picWidth)
     wx.redirectTo({
-      url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight,
+      url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight+"&arroundScope="+arroundScope,
     })
   },
   navToDestination:function(scenicPlaceX,scenicPlaceY){

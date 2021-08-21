@@ -40,12 +40,13 @@ Page({
     options.picUrl="/ElectronicGuide/upload/ScenicPlacePic/1628583735118.png";
     options.picWidth=30;
     options.picHeight=30;
+    options.arroundScope=30;
     */
 
     scenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
     serverPath=getApp().getServerPath();
-    scenicPlace.setData({id:options.id,name:options.name,x:options.x,y:options.y,picUrl:options.picUrl,picWidth:options.picWidth,picHeight:options.picHeight});
+    scenicPlace.setData({id:options.id,name:options.name,x:options.x,y:options.y,picUrl:options.picUrl,picWidth:options.picWidth,picHeight:options.picHeight,arroundScope:options.arroundScope});
     scenicPlace.getWindowSize();
   },
   getWindowSize:function(){
@@ -490,6 +491,7 @@ Page({
             scenicPlace.navToDestination();
           }
 
+          scenicPlace.checkIfInArroundScope();
           if(scenicPlace.checkIfOverDetailScope())
             scenicPlace.checkNearScenicPlace();
         }
@@ -589,6 +591,23 @@ Page({
     else{
       scenicPlace.setData({dzdyButState:true});
       scenicPlace.optionDetailAudioSrc("continue");
+    }
+  },
+  checkIfInArroundScope:function(){
+    let meX=scenicPlace.data.meX;
+    let meY=scenicPlace.data.meY;
+    let x=scenicPlace.data.x;
+    let y=scenicPlace.data.y;
+    let chaX=Math.abs(meX-x);
+    let chaY=Math.abs(meY-y);
+    let distance=Math.sqrt(chaX*chaX+chaY*chaY);
+    if(distance<=scenicPlace.data.arroundScope){
+      console.log("已到景点范围内...");
+      clearInterval(updateNavLineInterval);
+      return true;
+    }
+    else{
+      return false;
     }
   },
 
