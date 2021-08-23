@@ -117,6 +117,7 @@ Page({
           //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
         }
         scenicPlace.setData({scenicPlaceList:scenicPlaceList});
+        scenicPlace.navToDestination();//一开始页面数据加载完就显示最近路线
       }
     })
   },
