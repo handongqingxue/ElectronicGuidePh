@@ -78,6 +78,41 @@
 .arrived_cv{
   width:97%;height:150px;margin:0 auto;background-color: #fff;
 }
+.arrived_cv .total_cv{
+  width:85%;
+  height:80px;
+  margin:10px auto 0;
+  border-top:#eee solid 1px;
+  border-bottom:#eee solid 1px;
+}
+.arrived_cv .item_cv{
+  width:50%;
+  height:80px;
+  text-align:center;
+}
+.arrived_cv .time_cv{
+  margin-top:-80px;
+  margin-left:50%;
+}
+.arrived_cv .item_cv .value_cv{
+  width:100%;
+  height:30px;
+  line-height:30px;
+  margin-top:10px;
+  font-size:25px;
+  font-weight:bold;
+  color:#000;
+}
+.arrived_cv .item_cv .label_cv{
+  width:100%;
+  height:20px;
+  line-height:20px;
+  margin-top:10px;
+  margin-bottom:10px;
+  font-size:15px;
+  color:#999;
+}
+
 .detail_audio{
   display:none;
 }

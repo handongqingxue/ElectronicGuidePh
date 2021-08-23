@@ -1,6 +1,6 @@
 <!--miniprogram/pages/scenicPlace/scenicPlace.wxml-->
 <scroll-view scroll-x="true" scroll-y="true" style="width:{{windowWidth}}px;height:{{windowHeight}}px;overflow: auto;" bindscroll="scrollCanvas">
-    <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;">
+    <canvas canvas-id="sceDisCanvas" style="width: {{sceDisCanvasStyleWidth}}px; height: {{sceDisCanvasStyleHeight}}px;" bindtap="getTouchPoint">
     </canvas>
 </scroll-view>
 <cover-view class="scale_set_cv">
@@ -21,9 +21,15 @@
 </cover-view>
 <cover-view class="arrived_bg_cv {{showArrivedBgCVFlag?'show_abgcv':'hide_abgcv'}}">
   <cover-view class="arrived_cv">
-    <cover-view class="total_cv" style="width:85%;margin:0 auto;background-color:#00f;">
-      <cover-view style="width:50%;height:100px;background-color:#0f0;">步行(m){{workDistance}}</cover-view>
-    用时{{workTime}}
+    <cover-view class="total_cv">
+      <cover-view class="item_cv">
+        <cover-view class="value_cv">{{workDistance}}</cover-view>
+        <cover-view class="label_cv">步行(m)</cover-view>
+      </cover-view>
+      <cover-view class="item_cv time_cv">
+        <cover-view class="value_cv">{{workTime}}</cover-view>
+        <cover-view class="label_cv">用时(min)</cover-view>
+      </cover-view>
     </cover-view>
   </cover-view>
 </cover-view>
