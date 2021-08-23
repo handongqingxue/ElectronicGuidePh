@@ -363,9 +363,16 @@ Page({
       let endX=scenicPlace.x+scenicPlace.picWidth/2;
       let startY=scenicPlace.y-scenicPlace.picHeight/2;
       let endY=scenicPlace.y+scenicPlace.picHeight/2;
-      if(x>=startX&x<=endX&y>=startY&y<=endY)
-        console.log(scenicPlace.name);
+      if(x>=startX&x<=endX&y>=startY&y<=endY){
+        //console.log("id="+scenicPlace.id+","+scenicPlace.name+",x="+scenicPlace.x+",y="+scenicPlace.y);
+        scenicDistrict.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight,scenicPlace.arroundScope);
+      }
     }
+  },
+  goScenicPlace:function(id,name,x,y,picUrl,picWidth,picHeight,arroundScope){
+    wx.redirectTo({
+      url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight+"&arroundScope="+arroundScope,
+    })
   },
   scrollCanvas:function(e){
     scenicDistrict.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
