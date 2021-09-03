@@ -260,6 +260,10 @@ Page({
     allScenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
   getTouchPoint:function(e){
+    wx.redirectTo({
+      url: '/pages/scenicDistrict/scenicDistrict',
+    })
+
     let pageX=e.touches[0].pageX;
     let pageY=e.touches[0].pageY;
     let scrollLeft=allScenicPlace.data.sceDisCanvasScrollLeft;

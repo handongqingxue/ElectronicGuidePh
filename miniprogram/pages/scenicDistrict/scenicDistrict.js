@@ -4,8 +4,11 @@ var scenicDistrict;
 var serverPathCQ;
 var serverPathSD;
 var serverPath;
+var sceDisCanvasImagePath;
 var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
+var scenicPlaceList;
+var scenicPlaceLength;
 Page({
 
   /**
@@ -117,50 +120,63 @@ Page({
   onShareAppMessage: function () {
 
   },
+  checkSceDisInfo:function(){
+    let sceDis=getApp().sceDis;
+    if(sceDis==undefined)
+      return false;
+    else
+      return true;
+  },
   selectSceDisById:function(){
-    let sceDisId=wx.getStorageSync('sceDisId');
-    wx.request({
-      url: serverPathCQ+"selectSceDisById",
-      method: 'POST',
-      data: { id: sceDisId},
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      success: function (res) {
-        let data=res.data;
-        console.log(data);
-        var status = res.data.status;
-        if (status == "ok") {
-          let sceDis=data.sceDis;
-          let sceDisCanvasMinWidth=sceDis.mapWidth;
-          let sceDisCanvasMinHeight=sceDis.mapHeight;
-          let sceDisCanvasMaxWidth=sceDis.picWidth;
-          let sceDisCanvasMaxHeight=sceDis.picHeight;
-          scenicDistrict.setData({
-            sceDis:sceDis,
-            sceDisCanvasMinWidth:sceDisCanvasMinWidth,
-            sceDisCanvasMinHeight:sceDisCanvasMinHeight,
-            sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
-            sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
-            sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
-            sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
-          });
-          serverPathSD="http://"+scenicDistrict.data.sceDis.serverName+":8080/ElectronicGuideSD/";
-          
-          scenicDistrict.jiSuanLocationScale(data.sceDis);
-          //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
-          //https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg
-          scenicDistrict.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
-          //scenicDistrict.getSceDisImageInfo("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
+    if(scenicDistrict.checkSceDisInfo()){
+      let sceDis=getApp().sceDis;
+      scenicDistrict.initSceDisInfo(sceDis);
+    }
+    else{
+      let sceDisId=wx.getStorageSync('sceDisId');
+      wx.request({
+        url: serverPathCQ+"selectSceDisById",
+        method: 'POST',
+        data: { id: sceDisId},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          console.log(data);
+          var status = res.data.status;
+          if (status == "ok") {
+            let sceDis=data.sceDis;
+            getApp().sceDis=sceDis;
+            scenicDistrict.initSceDisInfo(sceDis);
+          }
+        },
+        fail:function(res){
+          getApp().showToast(serverPathCQ);
+          scenicDistrict.setData({toastMsg:JSON.stringify(res)});
         }
-      },
-      fail:function(res){
-        getApp().showToast(serverPathCQ);
-        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
-        //scenicDistrict.downloadFile("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
-        //scenicDistrict.getSceDisImageInfo("https://www.bainuojiaoche.com/GoodsPublic/upload/1513819863143.jpg");
-      }
-    })
+      })
+    }
+  },
+  initSceDisInfo:function(sceDis){
+    let sceDisCanvasMinWidth=sceDis.mapWidth;
+    let sceDisCanvasMinHeight=sceDis.mapHeight;
+    let sceDisCanvasMaxWidth=sceDis.picWidth;
+    let sceDisCanvasMaxHeight=sceDis.picHeight;
+    scenicDistrict.setData({
+      sceDis:sceDis,
+      sceDisCanvasMinWidth:sceDisCanvasMinWidth,
+      sceDisCanvasMinHeight:sceDisCanvasMinHeight,
+      sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
+      sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
+      sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
+      sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
+    });
+    serverPathSD="http://"+sceDis.serverName+":8080/ElectronicGuideSD/";
+    
+    scenicDistrict.jiSuanLocationScale(sceDis);
+    //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
+    scenicDistrict.getSceDisImageInfo(serverPath+sceDis.mapUrl);
   },
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
@@ -179,35 +195,57 @@ Page({
       }
     });
   },
+  checkSceDisImageInfo:function(){
+    let sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
+    if(sceDisCanvasImagePath==undefined)
+      return false;
+    else
+      return true;
+  },
   getSceDisImageInfo:function(src){
     //console.log("src="+src)
     //console.log("serverPathSD="+serverPathSD);
-    wx.getImageInfo({
-      src: src,
-      success: function (res){
-        scenicDistrict.setData({sceDisCanvasImagePath:res.path})
-        scenicDistrict.selectScenicPlaceList();
-      },
-      fail: function(res){
-        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
-      }
-    })
+    if(scenicDistrict.checkSceDisImageInfo()){
+      sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
+      scenicDistrict.selectScenicPlaceList();
+    }
+    else{
+      wx.getImageInfo({
+        src: src,
+        success: function (res){
+          sceDisCanvasImagePath=res.path;
+          getApp().sceDisCanvasImagePath=sceDisCanvasImagePath;
+          scenicDistrict.selectScenicPlaceList();
+        },
+        fail: function(res){
+          scenicDistrict.setData({toastMsg:JSON.stringify(res)});
+        }
+      })
+    }
   },
   getScenicPlaceImageInfo:function(scenicPlaceItem){
-    wx.getImageInfo({
-      src: serverPath+scenicPlaceItem.picUrl,
-      success: function (res){
-        scenicPlaceItem.imageSrc=res.path;
-        scenicPlaceImageCount++;
-        let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
-        if(scenicPlaceImageCount==scenicPlaceLength){
-          scenicDistrict.initSceDisCanvas(scenicDistrict.data.sceDisCanvasImagePath,false);
-        }
-      },
-      fail: function(res){
-        scenicDistrict.setData({toastMsg:JSON.stringify(res)});
+    let scenicPlaceLength=getApp().scenicPlaceLength;
+    if(getApp().checkScenicPlaceImageInfo(scenicPlaceItem.imageSrc)){
+      scenicPlaceImageCount++;
+      if(scenicPlaceImageCount==scenicPlaceLength){
+        scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
       }
-    })
+    }
+    else{
+      wx.getImageInfo({
+        src: serverPath+scenicPlaceItem.picUrl,
+        success: function (res){
+          scenicPlaceItem.imageSrc=res.path;
+          scenicPlaceImageCount++;
+          if(scenicPlaceImageCount==scenicPlaceLength){
+            scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
+          }
+        },
+        fail: function(res){
+          scenicDistrict.setData({toastMsg:JSON.stringify(res)});
+        }
+      })
+    }
   },
   initSceDisCanvas:function(path,reSizeFlag){
     let scenicDistrictData=scenicDistrict.data;
@@ -231,34 +269,38 @@ Page({
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
 
     canvasScenicPlaceCount=0;
-    let scenicPlaceList=scenicDistrict.data.scenicPlaceList;
     for(var i=0;i<scenicPlaceList.length;i++){
       let scenicPlaceItem=scenicPlaceList[i];
       scenicDistrict.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
     }
   },
   selectScenicPlaceList:function(){
-    wx.request({
-      url:serverPathSD+"wechatApplet/selectScenicPlaceList",
-      method: 'POST',
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      success: function (res) {
-        let data=res.data;
-        let scenicPlaceList=data.scenicPlaceList;
-        scenicDistrict.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
-        scenicPlaceImageCount=0;
-        canvasScenicPlaceCount=0;
-        for(let i=0;i<scenicPlaceList.length;i++){
-          //if(i==2)
-            scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i]);
+    if(!getApp().checkScenicPlaceList()){
+      wx.request({
+        url:serverPathSD+"wechatApplet/selectScenicPlaceList",
+        method: 'POST',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          scenicPlaceList=data.scenicPlaceList;
+
+          getApp().scenicPlaceList=scenicPlaceList;
+          getApp().scenicPlaceLength=scenicPlaceList.length;
+
+          scenicPlaceImageCount=0;
+          canvasScenicPlaceCount=0;
+          for(let i=0;i<scenicPlaceList.length;i++){
+            //if(i==2)
+              scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i]);
+          }
+        },
+        fail:function(){
+          
         }
-      },
-      fail:function(){
-        console.log("kkkkkkkkkkkk")
-      }
-    })
+      })
+    }
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     canvasScenicPlaceCount++;
@@ -281,7 +323,7 @@ Page({
     sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
-    let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
+    let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
       scenicDistrict.drawMeLocation();
     }
@@ -370,7 +412,6 @@ Page({
     let x=(scrollLeft+pageX)/widthScale;
     let y=(sceDisCanvasStyleHeight-scrollTop-pageY)/heightScale;
     console.log(x+","+y);
-    let scenicPlaceList=scenicDistrict.data.scenicPlaceList;
     for(let i=0;i<scenicPlaceList.length;i++){
       let scenicPlace=scenicPlaceList[i];
       let startX=scenicPlace.x-scenicPlace.picWidth/2;

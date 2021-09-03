@@ -3,6 +3,10 @@
 var serverPathCQ = "http://124.70.38.226:8080/ElectronicGuideCQ/wechatApplet/";
 //var serverPath = "https://www.qrcodesy.com";
 var serverPath = "http://192.168.2.166:8080";
+var sceDis;
+var sceDisCanvasImagePath;
+var scenicPlaceList;
+var scenicPlaceLength;
 
 App({
   onLaunch: function () {
@@ -26,6 +30,27 @@ App({
   },
   getServerPath:function(){
     return serverPath;
+  },
+  setSceDis:function(sceDis){
+    this.sceDis=sceDis;
+  },
+  getSceDis:function(){
+    return sceDis;
+  },
+  getSceDisCanvasImagePath:function(){
+    return sceDisCanvasImagePath;
+  },
+  checkScenicPlaceList:function(){
+    if(scenicPlaceList==undefined)
+      return false;
+    else
+      return true;
+  },
+  checkScenicPlaceImageInfo:function(imageSrc){
+    if(imageSrc==undefined)
+      return false;
+    else
+      return true;
   },
   showToast:function(title){
     wx.showToast({
