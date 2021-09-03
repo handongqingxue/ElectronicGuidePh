@@ -4,6 +4,7 @@ var scenicDistrict;
 var serverPathCQ;
 var serverPathSD;
 var serverPath;
+var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
 Page({
 
@@ -144,7 +145,7 @@ Page({
             sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
             sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
           });
-          serverPathSD="https://"+scenicDistrict.data.sceDis.serverName+"/ElectronicGuideSD/";
+          serverPathSD="http://"+scenicDistrict.data.sceDis.serverName+":8080/ElectronicGuideSD/";
           
           scenicDistrict.jiSuanLocationScale(data.sceDis);
           //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
@@ -179,25 +180,29 @@ Page({
     });
   },
   getSceDisImageInfo:function(src){
+    //console.log("src="+src)
+    //console.log("serverPathSD="+serverPathSD);
     wx.getImageInfo({
       src: src,
       success: function (res){
         scenicDistrict.setData({sceDisCanvasImagePath:res.path})
-        scenicDistrict.initSceDisCanvas(res.path,false);
+        scenicDistrict.selectScenicPlaceList();
       },
       fail: function(res){
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
       }
     })
   },
-  getScenicPlaceImageInfo:function(scenicPlace){
-    //console.log(scenicPlace.picUrl);
+  getScenicPlaceImageInfo:function(scenicPlaceItem){
     wx.getImageInfo({
-      //src: "https://localhost"+scenicPlace.picUrl,
-      src: "https://www.qrcodesy.com"+scenicPlace.picUrl,
+      src: serverPath+scenicPlaceItem.picUrl,
       success: function (res){
-        scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight);
-        //scenicDistrict.drawScenicPlace(scenicPlace.name,res.path,50,50,scenicPlace.picWidth,scenicPlace.picHeight);
+        scenicPlaceItem.imageSrc=res.path;
+        scenicPlaceImageCount++;
+        let scenicPlaceLength=scenicDistrict.data.scenicPlaceLength;
+        if(scenicPlaceImageCount==scenicPlaceLength){
+          scenicDistrict.initSceDisCanvas(scenicDistrict.data.sceDisCanvasImagePath,false);
+        }
       },
       fail: function(res){
         scenicDistrict.setData({toastMsg:JSON.stringify(res)});
@@ -216,7 +221,7 @@ Page({
     //console.log("sceDisCanvasImageX="+sceDisCanvasImageX+",sceDisCanvasImageY="+sceDisCanvasImageY+",sceDisCanvasStyleWidth="+sceDisCanvasStyleWidth+",sceDisCanvasStyleHeight="+sceDisCanvasStyleHeight)
     let sceDisCanvas=null;
     if(reSizeFlag){
-      scenicDistrict.clearSceDisCanvas();
+      //scenicDistrict.clearSceDisCanvas();
       sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     }
     else{
@@ -225,7 +230,12 @@ Page({
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
 
-    scenicDistrict.selectScenicPlaceList()
+    canvasScenicPlaceCount=0;
+    let scenicPlaceList=scenicDistrict.data.scenicPlaceList;
+    for(var i=0;i<scenicPlaceList.length;i++){
+      let scenicPlaceItem=scenicPlaceList[i];
+      scenicDistrict.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
+    }
   },
   selectScenicPlaceList:function(){
     wx.request({
@@ -238,11 +248,15 @@ Page({
         let data=res.data;
         let scenicPlaceList=data.scenicPlaceList;
         scenicDistrict.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
+        scenicPlaceImageCount=0;
         canvasScenicPlaceCount=0;
         for(let i=0;i<scenicPlaceList.length;i++){
           //if(i==2)
             scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i]);
         }
+      },
+      fail:function(){
+        console.log("kkkkkkkkkkkk")
       }
     })
   },
