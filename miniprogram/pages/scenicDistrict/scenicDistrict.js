@@ -129,10 +129,12 @@ Page({
   },
   selectSceDisById:function(){
     if(scenicDistrict.checkSceDisInfo()){
+      console.log("景区信息已下载");
       let sceDis=getApp().sceDis;
       scenicDistrict.initSceDisInfo(sceDis);
     }
     else{
+      console.log("重新下载景区信息");
       let sceDisId=wx.getStorageSync('sceDisId');
       wx.request({
         url: serverPathCQ+"selectSceDisById",
@@ -206,10 +208,12 @@ Page({
     //console.log("src="+src)
     //console.log("serverPathSD="+serverPathSD);
     if(scenicDistrict.checkSceDisCanvasImagePath()){
+      console.log("景区地图已下载");
       sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
       scenicDistrict.selectScenicPlaceList();
     }
     else{
+      console.log("重新下载景区地图");
       wx.getImageInfo({
         src: src,
         success: function (res){
@@ -288,10 +292,12 @@ Page({
   },
   selectScenicPlaceList:function(){
     if(scenicDistrict.checkScenicPlaceList()){
+      console.log("景点列表已下载");
       scenicPlaceList=getApp().scenicPlaceList;
       scenicDistrict.initScenicPlaceList(scenicPlaceList);
     }
     else{
+      console.log("重新下载景点列表");
       wx.request({
         url:serverPathSD+"wechatApplet/selectScenicPlaceList",
         method: 'POST',

@@ -129,7 +129,6 @@ Page({
       wx.getImageInfo({
         src: src,
         success: function (res){
-          //allScenicPlace.initSceDisCanvas(res.path,false);
           sceDisCanvasImagePath=res.path;
           getApp().sceDisCanvasImagePath=sceDisCanvasImagePath;
           allScenicPlace.selectScenicPlaceList();
@@ -221,7 +220,6 @@ Page({
       wx.getImageInfo({
         src: serverPath+scenicPlaceItem.picUrl,
         success: function (res){
-          //allScenicPlace.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight);
           scenicPlaceItem.imageSrc=res.path;
           scenicPlaceImageCount++;
           if(scenicPlaceImageCount==scenicPlaceLength){
@@ -337,10 +335,12 @@ Page({
     allScenicPlace.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
   getTouchPoint:function(e){
+    /*
     wx.redirectTo({
       url: '/pages/scenicDistrict/scenicDistrict',
     })
     return false;
+    */
 
     let pageX=e.touches[0].pageX;
     let pageY=e.touches[0].pageY;
@@ -355,7 +355,6 @@ Page({
     let x=(scrollLeft+pageX)/widthScale;
     let y=(sceDisCanvasStyleHeight-scrollTop-pageY)/heightScale;
     console.log(x+","+y);
-    let scenicPlaceList=allScenicPlace.data.scenicPlaceList;
     for(let i=0;i<scenicPlaceList.length;i++){
       let scenicPlace=scenicPlaceList[i];
       let startX=scenicPlace.x-scenicPlace.picWidth/2;

@@ -4,6 +4,11 @@ var scenicPlace;
 var serverPathCQ;
 var serverPathSD;
 var serverPath;
+var sceDisCanvasImagePath;
+var scenicPlaceImageCount;
+var canvasScenicPlaceCount;
+var scenicPlaceList;
+var scenicPlaceLength;
 var updateNavLineInterval;
 var detailAudio;
 var scenicPlaceImageCount;
@@ -99,27 +104,42 @@ Page({
       console.log(e.detail.errMsg);
     }
   },
+  checkScenicPlaceList:function(){
+    if(scenicPlaceList==undefined)
+      return false;
+    else
+      return true;
+  },
   selectScenicPlaceList:function(){
-    wx.request({
-      url:serverPathSD+"wechatApplet/selectScenicPlaceList",
-      method: 'POST',
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      success: function (res) {
-        let data=res.data;
-        let scenicPlaceList=data.scenicPlaceList;
-        scenicPlace.setData({scenicPlaceLength:scenicPlaceList.length});
-        scenicPlaceImageCount=0;
-        canvasScenicPlaceCount=0;
-        for(var i=0;i<scenicPlaceList.length;i++){
-          scenicPlace.getScenicPlaceImageInfo(scenicPlaceList[i]);
-          //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
+    if(scenicPlace.checkScenicPlaceList()){
+      scenicPlaceList=getApp().scenicPlaceList;
+      scenicPlace.initScenicPlaceList(scenicPlaceList);
+    }
+    else{
+      wx.request({
+        url:serverPathSD+"wechatApplet/selectScenicPlaceList",
+        method: 'POST',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          scenicPlaceList=data.scenicPlaceList;
+          getApp().scenicPlaceList=scenicPlaceList;
+          getApp().scenicPlaceLength=scenicPlaceList.length;
+          scenicPlace.initScenicPlaceList(scenicPlaceList);
         }
-        scenicPlace.setData({scenicPlaceList:scenicPlaceList});
-        scenicPlace.navToDestination();//一开始页面数据加载完就显示最近路线
-      }
-    })
+      })
+    }
+  },
+  initScenicPlaceList:function(scenicPlaceList){
+    scenicPlaceImageCount=0;
+    canvasScenicPlaceCount=0;
+    for(var i=0;i<scenicPlaceList.length;i++){
+      scenicPlace.initScenicPlaceImageSrc(scenicPlaceList[i]);
+      //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
+    }
+    scenicPlace.navToDestination();//一开始页面数据加载完就显示最近路线
   },
   selectRoadStageList:function(){
     wx.request({
@@ -140,48 +160,66 @@ Page({
       }
     });
   },
+  checkSceDisInfo:function(){
+    let sceDis=getApp().sceDis;
+    if(sceDis==undefined)
+      return false;
+    else
+      return true;
+  },
   selectSceDisById:function(){
-    let sceDisId=wx.getStorageSync('sceDisId');
-    wx.request({
-      url: serverPathCQ+"selectSceDisById",
-      method: 'POST',
-      data: { id: sceDisId},
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      success: function (res) {
-        let data=res.data;
-        console.log(data);
-        var status = res.data.status;
-        if (status == "ok") {
-          let sceDis=data.sceDis;
-          let sceDisCanvasMinWidth=sceDis.mapWidth;
-          let sceDisCanvasMinHeight=sceDis.mapHeight;
-          let sceDisCanvasMaxWidth=sceDis.picWidth;
-          let sceDisCanvasMaxHeight=sceDis.picHeight;
-          scenicPlace.setData({
-            sceDis:sceDis,
-            sceDisCanvasMinWidth:sceDisCanvasMinWidth,
-            sceDisCanvasMinHeight:sceDisCanvasMinHeight,
-            sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
-            sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
-            sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
-            sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
-          });
-          serverPathSD="https://"+scenicPlace.data.sceDis.serverName+"/ElectronicGuideSD/";
-          scenicPlace.jiSuanLocationScale(data.sceDis);
-          scenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
-          scenicPlace.selectRoadStageList();
-
-          scenicPlace.setData({meX:1250,meY:580});
-          //scenicPlace.setData({meX:1154,meY:580});
+    if(scenicPlace.checkSceDisInfo()){
+      let sceDis=getApp().sceDis;
+      scenicPlace.initSceDisInfo(sceDis);
+    }
+    else{
+      let sceDisId=wx.getStorageSync('sceDisId');
+      wx.request({
+        url: serverPathCQ+"selectSceDisById",
+        method: 'POST',
+        data: { id: sceDisId},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          console.log(data);
+          var status = res.data.status;
+          if (status == "ok") {
+            let sceDis=data.sceDis;
+            getApp().sceDis=sceDis;
+            scenicPlace.initSceDisInfo(sceDis);
+          }
+        },
+        fail:function(res){
+          getApp().showToast(serverPathCQ);
+          scenicPlace.setData({toastMsg:JSON.stringify(res)});
         }
-      },
-      fail:function(res){
-        getApp().showToast(serverPathCQ);
-        scenicPlace.setData({toastMsg:JSON.stringify(res)});
-      }
-    })
+      })
+    }
+  },
+  initSceDisInfo:function(sceDis){
+    let sceDisCanvasMinWidth=sceDis.mapWidth;
+    let sceDisCanvasMinHeight=sceDis.mapHeight;
+    let sceDisCanvasMaxWidth=sceDis.picWidth;
+    let sceDisCanvasMaxHeight=sceDis.picHeight;
+    scenicPlace.setData({
+      sceDis:sceDis,
+      sceDisCanvasMinWidth:sceDisCanvasMinWidth,
+      sceDisCanvasMinHeight:sceDisCanvasMinHeight,
+      sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
+      sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
+      sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
+      sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
+    });
+    //serverPathSD="https://"+sceDis.serverName+"/ElectronicGuideSD/";
+    serverPathSD="http://"+sceDis.serverName+":8080/ElectronicGuideSD/";
+    scenicPlace.jiSuanLocationScale(sceDis);
+    scenicPlace.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);
+    scenicPlace.selectRoadStageList();
+
+    scenicPlace.setData({meX:1250,meY:580});
+    //scenicPlace.setData({meX:1154,meY:580});
   },
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
@@ -189,17 +227,31 @@ Page({
     console.log(locationWidthScale+","+locationHeightScale);
     scenicPlace.setData({locationWidthScale:locationWidthScale,locationHeightScale:locationHeightScale});
   },
-  getSceDisImageInfo:function(src){
-    wx.getImageInfo({
-      src: src,
-      success: function (res){
-        scenicPlace.setData({sceDisCanvasImagePath:res.path})
-        scenicPlace.selectScenicPlaceList();
-      },
-      fail: function(res){
-        scenicPlace.setData({toastMsg:JSON.stringify(res)});
-      }
-    })
+  checkSceDisCanvasImagePath:function(){
+    let sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
+    if(sceDisCanvasImagePath==undefined)
+      return false;
+    else
+      return true;
+  },
+  initSceDisCanvasImagePath:function(src){
+    if(scenicPlace.checkSceDisCanvasImagePath()){
+      sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
+      scenicPlace.selectScenicPlaceList();
+    }
+    else{
+      wx.getImageInfo({
+        src: src,
+        success: function (res){
+          sceDisCanvasImagePath=res.path;
+          getApp().sceDisCanvasImagePath=sceDisCanvasImagePath;
+          scenicPlace.selectScenicPlaceList();
+        },
+        fail: function(res){
+          scenicPlace.setData({toastMsg:JSON.stringify(res)});
+        }
+      })
+    }
   },
   checkSceDisImage:function(){
     if(scenicPlace.data.sceDisCanvasImagePath===undefined){
@@ -209,21 +261,36 @@ Page({
       return true;
     }
   },
-  getScenicPlaceImageInfo:function(scenicPlaceItem){
-    wx.getImageInfo({
-      src: "https://"+scenicPlace.data.sceDis.serverName+scenicPlaceItem.picUrl,
-      success: function (res){
-        //console.log("res.path="+res.path);
-        scenicPlaceItem.imageSrc=res.path;
-        scenicPlaceImageCount++;
-        let scenicPlaceLength=scenicPlace.data.scenicPlaceLength;
-        if(scenicPlaceImageCount==scenicPlaceLength)
-          scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,false);
-      },
-      fail: function(res){
-
+  checkScenicPlaceImageSrc:function(imageSrc){
+    if(imageSrc==undefined)
+      return false;
+    else
+      return true;
+  },
+  initScenicPlaceImageSrc:function(scenicPlaceItem){
+    let scenicPlaceLength=getApp().scenicPlaceLength;
+    if(scenicPlace.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
+      scenicPlaceImageCount++;
+      if(scenicPlaceImageCount==scenicPlaceLength){
+        scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
       }
-    })
+    }
+    else{
+      wx.getImageInfo({
+        src: serverPath+scenicPlaceItem.picUrl,
+        success: function (res){
+          //console.log("res.path="+res.path);
+          scenicPlaceItem.imageSrc=res.path;
+          scenicPlaceImageCount++;
+          if(scenicPlaceImageCount==scenicPlaceLength){
+            scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+          }
+        },
+        fail: function(res){
+
+        }
+      })
+    }
   },
   initSceDisCanvas:function(path,reSizeFlag){
     let scenicPlaceData=scenicPlace.data;
@@ -246,11 +313,9 @@ Page({
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
 
     canvasScenicPlaceCount=0;
-    let scenicPlaceList=scenicPlace.data.scenicPlaceList;
     for(var i=0;i<scenicPlaceList.length;i++){
       let scenicPlaceItem=scenicPlaceList[i];
       scenicPlace.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
-      //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
     }
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
@@ -273,7 +338,7 @@ Page({
     sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
-    let scenicPlaceLength=scenicPlace.data.scenicPlaceLength;
+    let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
       scenicPlace.drawMeLocation();
     }
@@ -347,7 +412,7 @@ Page({
       sceDisCanvasStyleWidth:sceDisCanvasStyleWidth,
       sceDisCanvasStyleHeight:sceDisCanvasStyleHeight
     })
-    scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+    scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,true);
   },
   clearSceDisCanvas:function(){
     let sceDis=scenicPlace.data.sceDis;
@@ -398,7 +463,7 @@ Page({
           scenicPlace.initRoadStageNavList(data.roadStageList);
         }
         scenicPlace.setData({navFlag:true});
-        scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+        scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,true);
       }
     })
   },
@@ -501,12 +566,10 @@ Page({
             let nearRoadStage=scenicPlace.data.nearRoadStage;
             //console.log("nearRoadStage="+nearRoadStage.frontX);
             if(nearX==nearRoadStage.frontX&nearY==nearRoadStage.frontY){
-              console.log("111111111");
               scenicPlace.initMeToSPRoadStageNavList();
-              scenicPlace.initSceDisCanvas(scenicPlace.data.sceDisCanvasImagePath,true);
+              scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,true);
             }
             else{
-              console.log("2222222222");
               scenicPlace.navToDestination();
             }
 
