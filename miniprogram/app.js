@@ -40,18 +40,6 @@ App({
   getSceDisCanvasImagePath:function(){
     return sceDisCanvasImagePath;
   },
-  checkScenicPlaceList:function(){
-    if(scenicPlaceList==undefined)
-      return false;
-    else
-      return true;
-  },
-  checkScenicPlaceImageInfo:function(imageSrc){
-    if(imageSrc==undefined)
-      return false;
-    else
-      return true;
-  },
   showToast:function(title){
     wx.showToast({
       title: title,

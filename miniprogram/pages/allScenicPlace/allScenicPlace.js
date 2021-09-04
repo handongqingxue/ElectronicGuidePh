@@ -3,7 +3,11 @@ var allScenicPlace;
 var serverPathCQ;
 var serverPathSD;
 var serverPath;
+var sceDisCanvasImagePath;
+var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
+var scenicPlaceList;
+var scenicPlaceLength;
 Page({
 
   /**
@@ -46,44 +50,62 @@ Page({
   onReady: function () {
     allScenicPlace.selectSceDisById();
   },
+  checkSceDisInfo:function(){
+    let sceDis=getApp().sceDis;
+    if(sceDis==undefined)
+      return false;
+    else
+      return true;
+  },
   selectSceDisById:function(){
-    let sceDisId=wx.getStorageSync('sceDisId');
-    wx.request({
-      url: serverPathCQ+"selectSceDisById",
-      method: 'POST',
-      data: { id: sceDisId},
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      success: function (res) {
-        let data=res.data;
-        console.log(data);
-        var status = res.data.status;
-        if (status == "ok") {
-          let sceDis=data.sceDis;
-          let sceDisCanvasMinWidth=sceDis.mapWidth;
-          let sceDisCanvasMinHeight=sceDis.mapHeight;
-          let sceDisCanvasMaxWidth=sceDis.picWidth;
-          let sceDisCanvasMaxHeight=sceDis.picHeight;
-          allScenicPlace.setData({
-            sceDis:sceDis,
-            sceDisCanvasMinWidth:sceDisCanvasMinWidth,
-            sceDisCanvasMinHeight:sceDisCanvasMinHeight,
-            sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
-            sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
-            sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
-            sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
-          });
-          serverPathSD="https://"+allScenicPlace.data.sceDis.serverName+"/ElectronicGuideSD/";
-          allScenicPlace.jiSuanLocationScale(data.sceDis);
-          allScenicPlace.getSceDisImageInfo(serverPath+data.sceDis.mapUrl);
+    if(allScenicPlace.checkSceDisInfo()){
+      let sceDis=getApp().sceDis;
+      allScenicPlace.initSceDisInfo(sceDis);
+    }
+    else{
+      let sceDisId=wx.getStorageSync('sceDisId');
+      wx.request({
+        url: serverPathCQ+"selectSceDisById",
+        method: 'POST',
+        data: { id: sceDisId},
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          console.log(data);
+          var status = res.data.status;
+          if (status == "ok") {
+            let sceDis=data.sceDis;
+            getApp().sceDis=sceDis;
+            allScenicPlace.initSceDisInfo(sceDis);
+          }
+        },
+        fail:function(res){
+          getApp().showToast(serverPathCQ);
+          allScenicPlace.setData({toastMsg:JSON.stringify(res)});
         }
-      },
-      fail:function(res){
-        getApp().showToast(serverPathCQ);
-        allScenicPlace.setData({toastMsg:JSON.stringify(res)});
-      }
-    })
+      })
+    }
+  },
+  initSceDisInfo:function(sceDis){
+    let sceDisCanvasMinWidth=sceDis.mapWidth;
+    let sceDisCanvasMinHeight=sceDis.mapHeight;
+    let sceDisCanvasMaxWidth=sceDis.picWidth;
+    let sceDisCanvasMaxHeight=sceDis.picHeight;
+    allScenicPlace.setData({
+      sceDis:sceDis,
+      sceDisCanvasMinWidth:sceDisCanvasMinWidth,
+      sceDisCanvasMinHeight:sceDisCanvasMinHeight,
+      sceDisCanvasStyleWidth:sceDisCanvasMinWidth,
+      sceDisCanvasStyleHeight:sceDisCanvasMinHeight,
+      sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
+      sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
+    });
+    //serverPathSD="https://"+allScenicPlace.data.sceDis.serverName+"/ElectronicGuideSD/";
+    serverPathSD="http://"+sceDis.serverName+":8080/ElectronicGuideSD/";
+    allScenicPlace.jiSuanLocationScale(sceDis);
+    allScenicPlace.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);
   },
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
@@ -91,17 +113,32 @@ Page({
     console.log(locationWidthScale+","+locationHeightScale);
     allScenicPlace.setData({locationWidthScale:locationWidthScale,locationHeightScale:locationHeightScale});
   },
-  getSceDisImageInfo:function(src){
-    wx.getImageInfo({
-      src: src,
-      success: function (res){
-        allScenicPlace.setData({sceDisCanvasImagePath:res.path})
-        allScenicPlace.initSceDisCanvas(res.path,false);
-      },
-      fail: function(res){
-        allScenicPlace.setData({toastMsg:JSON.stringify(res)});
-      }
-    })
+  checkSceDisCanvasImagePath:function(){
+    let sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
+    if(sceDisCanvasImagePath==undefined)
+      return false;
+    else
+      return true;
+  },
+  initSceDisCanvasImagePath:function(src){
+    if(allScenicPlace.checkSceDisCanvasImagePath()){
+      sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
+      allScenicPlace.selectScenicPlaceList();
+    }
+    else{
+      wx.getImageInfo({
+        src: src,
+        success: function (res){
+          //allScenicPlace.initSceDisCanvas(res.path,false);
+          sceDisCanvasImagePath=res.path;
+          getApp().sceDisCanvasImagePath=sceDisCanvasImagePath;
+          allScenicPlace.selectScenicPlaceList();
+        },
+        fail: function(res){
+          allScenicPlace.setData({toastMsg:JSON.stringify(res)});
+        }
+      })
+    }
   },
   initSceDisCanvas:function(path,reSizeFlag){
     let allScenicPlaceData=allScenicPlace.data;
@@ -123,39 +160,79 @@ Page({
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
 
-    allScenicPlace.selectScenicPlaceList()
+    canvasScenicPlaceCount=0;
+    for(var i=0;i<scenicPlaceList.length;i++){
+      let scenicPlaceItem=scenicPlaceList[i];
+      allScenicPlace.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
+    }
+  },
+  checkScenicPlaceList:function(){
+    if(scenicPlaceList==undefined)
+      return false;
+    else
+      return true;
   },
   selectScenicPlaceList:function(){
-    wx.request({
-      url:serverPathSD+"wechatApplet/selectScenicPlaceList",
-      method: 'POST',
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      success: function (res) {
-        let data=res.data;
-        let scenicPlaceList=data.scenicPlaceList;
-        allScenicPlace.setData({scenicPlaceList:scenicPlaceList,scenicPlaceLength:scenicPlaceList.length});
-        canvasScenicPlaceCount=0;
-        for(let i=0;i<scenicPlaceList.length;i++){
-          //if(i==0)
-          allScenicPlace.getScenicPlaceImageInfo(scenicPlaceList[i]);
+    if(allScenicPlace.checkScenicPlaceList()){
+      scenicPlaceList=getApp().scenicPlaceList;
+      allScenicPlace.initScenicPlaceList(scenicPlaceList);
+    }
+    else{
+      wx.request({
+        url:serverPathSD+"wechatApplet/selectScenicPlaceList",
+        method: 'POST',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          scenicPlaceList=data.scenicPlaceList;
+          getApp().scenicPlaceList=scenicPlaceList;
+          getApp().scenicPlaceLength=scenicPlaceList.length;
+          allScenicPlace.initScenicPlaceList(scenicPlaceList);
         }
-      }
-    })
+      })
+    }
   },
-  getScenicPlaceImageInfo:function(scenicPlace){
-    //console.log(scenicPlace.picUrl);
-    wx.getImageInfo({
-      //src: "https://localhost"+scenicPlace.picUrl,
-      src: "https://www.qrcodesy.com"+scenicPlace.picUrl,
-      success: function (res){
-        allScenicPlace.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight);
-      },
-      fail: function(res){
-        allScenicPlace.setData({toastMsg:JSON.stringify(res)});
+  initScenicPlaceList:function(scenicPlaceList){
+    console.log("jjj")
+    scenicPlaceImageCount=0;
+    canvasScenicPlaceCount=0;
+    for(let i=0;i<scenicPlaceList.length;i++){
+      //if(i==0)
+      allScenicPlace.initScenicPlaceImageSrc(scenicPlaceList[i]);
+    }
+  },
+  checkScenicPlaceImageSrc:function(imageSrc){
+    if(imageSrc==undefined)
+      return false;
+    else
+      return true;
+  },
+  initScenicPlaceImageSrc:function(scenicPlaceItem){
+    let scenicPlaceLength=getApp().scenicPlaceLength;
+    if(allScenicPlace.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
+      scenicPlaceImageCount++;
+      if(scenicPlaceImageCount==scenicPlaceLength){
+        allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
       }
-    })
+    }
+    else{
+      wx.getImageInfo({
+        src: serverPath+scenicPlaceItem.picUrl,
+        success: function (res){
+          //allScenicPlace.drawScenicPlace(scenicPlace.name,res.path,scenicPlace.x,scenicPlace.y,scenicPlace.picWidth,scenicPlace.picHeight);
+          scenicPlaceItem.imageSrc=res.path;
+          scenicPlaceImageCount++;
+          if(scenicPlaceImageCount==scenicPlaceLength){
+            allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+          }
+        },
+        fail: function(res){
+          allScenicPlace.setData({toastMsg:JSON.stringify(res)});
+        }
+      })
+    }
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     canvasScenicPlaceCount++;
@@ -177,7 +254,7 @@ Page({
     sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+picHeight)
 
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
-    let scenicPlaceLength=allScenicPlace.data.scenicPlaceLength;
+    let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
       allScenicPlace.drawMeLocation();
     }
@@ -263,6 +340,7 @@ Page({
     wx.redirectTo({
       url: '/pages/scenicDistrict/scenicDistrict',
     })
+    return false;
 
     let pageX=e.touches[0].pageX;
     let pageY=e.touches[0].pageY;

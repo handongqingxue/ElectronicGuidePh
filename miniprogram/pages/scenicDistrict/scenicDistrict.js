@@ -176,7 +176,7 @@ Page({
     
     scenicDistrict.jiSuanLocationScale(sceDis);
     //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
-    scenicDistrict.getSceDisImageInfo(serverPath+sceDis.mapUrl);
+    scenicDistrict.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);
   },
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
@@ -195,17 +195,17 @@ Page({
       }
     });
   },
-  checkSceDisImageInfo:function(){
+  checkSceDisCanvasImagePath:function(){
     let sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
     if(sceDisCanvasImagePath==undefined)
       return false;
     else
       return true;
   },
-  getSceDisImageInfo:function(src){
+  initSceDisCanvasImagePath:function(src){
     //console.log("src="+src)
     //console.log("serverPathSD="+serverPathSD);
-    if(scenicDistrict.checkSceDisImageInfo()){
+    if(scenicDistrict.checkSceDisCanvasImagePath()){
       sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
       scenicDistrict.selectScenicPlaceList();
     }
@@ -223,9 +223,15 @@ Page({
       })
     }
   },
-  getScenicPlaceImageInfo:function(scenicPlaceItem){
+  checkScenicPlaceImageSrc:function(imageSrc){
+    if(imageSrc==undefined)
+      return false;
+    else
+      return true;
+  },
+  initScenicPlaceImageSrc:function(scenicPlaceItem){
     let scenicPlaceLength=getApp().scenicPlaceLength;
-    if(getApp().checkScenicPlaceImageInfo(scenicPlaceItem.imageSrc)){
+    if(scenicDistrict.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
       scenicPlaceImageCount++;
       if(scenicPlaceImageCount==scenicPlaceLength){
         scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
@@ -274,8 +280,18 @@ Page({
       scenicDistrict.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
     }
   },
+  checkScenicPlaceList:function(){
+    if(scenicPlaceList==undefined)
+      return false;
+    else
+      return true;
+  },
   selectScenicPlaceList:function(){
-    if(!getApp().checkScenicPlaceList()){
+    if(scenicDistrict.checkScenicPlaceList()){
+      scenicPlaceList=getApp().scenicPlaceList;
+      scenicDistrict.initScenicPlaceList(scenicPlaceList);
+    }
+    else{
       wx.request({
         url:serverPathSD+"wechatApplet/selectScenicPlaceList",
         method: 'POST',
@@ -285,21 +301,22 @@ Page({
         success: function (res) {
           let data=res.data;
           scenicPlaceList=data.scenicPlaceList;
-
           getApp().scenicPlaceList=scenicPlaceList;
           getApp().scenicPlaceLength=scenicPlaceList.length;
-
-          scenicPlaceImageCount=0;
-          canvasScenicPlaceCount=0;
-          for(let i=0;i<scenicPlaceList.length;i++){
-            //if(i==2)
-              scenicDistrict.getScenicPlaceImageInfo(scenicPlaceList[i]);
-          }
+          scenicDistrict.initScenicPlaceList(scenicPlaceList);
         },
         fail:function(){
           
         }
       })
+    }
+  },
+  initScenicPlaceList:function(scenicPlaceList){
+    scenicPlaceImageCount=0;
+    canvasScenicPlaceCount=0;
+    for(let i=0;i<scenicPlaceList.length;i++){
+      //if(i==2)
+        scenicDistrict.initScenicPlaceImageSrc(scenicPlaceList[i]);
     }
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
@@ -390,7 +407,7 @@ Page({
       sceDisCanvasStyleWidth:sceDisCanvasStyleWidth,
       sceDisCanvasStyleHeight:sceDisCanvasStyleHeight
     })
-    scenicDistrict.initSceDisCanvas(scenicDistrict.data.sceDisCanvasImagePath,true);
+    scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,true);
   },
   clearSceDisCanvas:function(){
     let sceDis=scenicDistrict.data.sceDis;
