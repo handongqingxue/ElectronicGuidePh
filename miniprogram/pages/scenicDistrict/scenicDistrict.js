@@ -285,6 +285,7 @@ Page({
     }
   },
   checkScenicPlaceList:function(){
+    let scenicPlaceList=getApp().scenicPlaceList;
     if(scenicPlaceList==undefined)
       return false;
     else
