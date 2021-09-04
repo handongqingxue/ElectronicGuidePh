@@ -8,6 +8,12 @@ var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
 var scenicPlaceList;
 var scenicPlaceLength;
+var canvasBusStopCount;
+var busStopList;
+var busStopLength;
+var busStopPicUrl;
+var busStopPicWidth;
+var busStopPicHeight;
 Page({
 
   /**
@@ -32,6 +38,9 @@ Page({
     allScenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
     serverPath=getApp().getServerPath();
+    busStopPicUrl=getApp().getBusStopPicUrl();
+    busStopPicWidth=getApp().getBusStopPicWidth();
+    busStopPicHeight=getApp().getBusStopPicHeight();
     let sceDisId=options.sceDisId;
     //wx.setStorageSync('sceDisId', sceDisId);
     wx.setStorageSync('sceDisId', 1);
@@ -208,6 +217,40 @@ Page({
       allScenicPlace.initScenicPlaceImageSrc(scenicPlaceList[i]);
     }
   },
+  checkBusStopList:function(){
+    let busStopList=getApp().busStopList;
+    if(busStopList==undefined)
+      return false;
+    else
+      return true;
+  },
+  selectBusStopList:function(){
+    if(allScenicPlace.checkBusStopList()){
+      console.log("站点列表已下载");
+      busStopList=getApp().busStopList;
+      allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+    }
+    else{
+      console.log("重新下载站点列表");
+      wx.request({
+        url:serverPathSD+"wechatApplet/selectBusStopList",
+        method: 'POST',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          busStopList=data.busStopList;
+          getApp().busStopList=busStopList;
+          getApp().busStopLength=busStopList.length;
+          allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+        },
+        fail:function(){
+          
+        }
+      })
+    }
+  },
   checkScenicPlaceImageSrc:function(imageSrc){
     if(imageSrc==undefined)
       return false;
@@ -219,7 +262,8 @@ Page({
     if(allScenicPlace.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
       scenicPlaceImageCount++;
       if(scenicPlaceImageCount==scenicPlaceLength){
-        allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+        //allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+        allScenicPlace.selectBusStopList();
       }
     }
     else{
@@ -229,7 +273,8 @@ Page({
           scenicPlaceItem.imageSrc=res.path;
           scenicPlaceImageCount++;
           if(scenicPlaceImageCount==scenicPlaceLength){
-            allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+            //allScenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+            allScenicPlace.selectBusStopList();
           }
         },
         fail: function(res){
@@ -260,6 +305,37 @@ Page({
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
     let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
+      //allScenicPlace.drawMeLocation();
+      canvasBusStopCount=0;
+      for(var i=0;i<busStopList.length;i++){
+        let busStopItem=busStopList[i];
+        allScenicPlace.drawBusStop(busStopItem.name,busStopItem.x,busStopItem.y);
+      }
+    }
+  },
+  drawBusStop:function(name,x,y){
+    canvasBusStopCount++;
+    console.log("canvasBusStopCount==="+canvasBusStopCount)
+    let sceDisCanvas=allScenicPlace.data.sceDisCanvas;
+    let sceDisCanvasStyleWidth=allScenicPlace.data.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=allScenicPlace.data.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=allScenicPlace.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=allScenicPlace.data.sceDisCanvasMinHeight;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    //h5页面随着地图放大，坐标自动跟着改变。小程序端不一样，必须根据比例重新计算出坐标位置
+    //h5页面绘制图片是以图片中心点为原点，小程序是以图片左下角为原点。若要做到和h5页面一样，需要用坐标减去图片宽度或高度的一半
+    sceDisCanvas.drawImage(busStopPicUrl, x*widthScale-busStopPicWidth/2, sceDisCanvasStyleHeight-y*heightScale-busStopPicHeight/2, busStopPicWidth, busStopPicHeight);
+
+    sceDisCanvas.font = 'normal bold 10px sans-serif';
+    sceDisCanvas.setTextAlign('center'); // 文字居中
+    sceDisCanvas.setFillStyle("#222");
+    //小程序绘制文字默认以文字中心为原点，而h5页面是以文字左下角为原点。这里不用重新计算
+    sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+busStopPicHeight)
+
+    //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
+    let busStopLength=getApp().busStopLength;
+    if(canvasBusStopCount==busStopLength){
       allScenicPlace.drawMeLocation();
     }
   },

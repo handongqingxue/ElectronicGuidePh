@@ -247,7 +247,6 @@ Page({
     if(scenicDistrict.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
       scenicPlaceImageCount++;
       if(scenicPlaceImageCount==scenicPlaceLength){
-        //scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
         scenicDistrict.selectBusStopList();
       }
     }
@@ -258,7 +257,6 @@ Page({
           scenicPlaceItem.imageSrc=res.path;
           scenicPlaceImageCount++;
           if(scenicPlaceImageCount==scenicPlaceLength){
-            //scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
             scenicDistrict.selectBusStopList();
           }
         },
@@ -348,7 +346,7 @@ Page({
     if(scenicDistrict.checkBusStopList()){
       console.log("站点列表已下载");
       busStopList=getApp().busStopList;
-      scenicDistrict.initBusStopList(busStopList);
+      scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
     }
     else{
       console.log("重新下载站点列表");
@@ -394,7 +392,6 @@ Page({
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
     let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
-      //scenicDistrict.drawMeLocation();
       canvasBusStopCount=0;
       for(var i=0;i<busStopList.length;i++){
         let busStopItem=busStopList[i];
