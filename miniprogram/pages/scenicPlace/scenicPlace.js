@@ -9,6 +9,12 @@ var scenicPlaceImageCount;
 var canvasScenicPlaceCount;
 var scenicPlaceList;
 var scenicPlaceLength;
+var canvasBusStopCount;
+var busStopList;
+var busStopLength;
+var busStopPicUrl;
+var busStopPicWidth;
+var busStopPicHeight;
 var updateNavLineInterval;
 var detailAudio;
 var scenicPlaceImageCount;
@@ -38,7 +44,6 @@ Page({
       }
     })
 
-    /*
     options.id=3;
     options.name="岳家庄";
     options.x=300;
@@ -47,11 +52,13 @@ Page({
     options.picWidth=30;
     options.picHeight=30;
     options.arroundScope=30;
-    */
 
     scenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
     serverPath=getApp().getServerPath();
+    busStopPicUrl=getApp().getBusStopPicUrl();
+    busStopPicWidth=getApp().getBusStopPicWidth();
+    busStopPicHeight=getApp().getBusStopPicHeight();
     scenicPlace.setData({id:options.id,name:options.name,x:options.x,y:options.y,picUrl:options.picUrl,picWidth:options.picWidth,picHeight:options.picHeight,arroundScope:options.arroundScope});
     scenicPlace.getWindowSize();
   },
@@ -142,7 +149,42 @@ Page({
       scenicPlace.initScenicPlaceImageSrc(scenicPlaceList[i]);
       //console.log("detailIntroScope==="+scenicPlaceList[i].detailIntroScope);
     }
-    scenicPlace.navToDestination();//一开始页面数据加载完就显示最近路线
+  },
+  checkBusStopList:function(){
+    let busStopList=getApp().busStopList;
+    if(busStopList==undefined)
+      return false;
+    else
+      return true;
+  },
+  selectBusStopList:function(){
+    if(scenicPlace.checkBusStopList()){
+      console.log("站点列表已下载");
+      busStopList=getApp().busStopList;
+      //scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+      scenicPlace.navToDestination();//一开始页面数据加载完就显示最近路线
+    }
+    else{
+      console.log("重新下载站点列表");
+      wx.request({
+        url:serverPathSD+"wechatApplet/selectBusStopList",
+        method: 'POST',
+        header: {
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        success: function (res) {
+          let data=res.data;
+          busStopList=data.busStopList;
+          getApp().busStopList=busStopList;
+          getApp().busStopLength=busStopList.length;
+          //scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+          scenicPlace.navToDestination();//一开始页面数据加载完就显示最近路线
+        },
+        fail:function(){
+          
+        }
+      })
+    }
   },
   selectRoadStageList:function(){
     wx.request({
@@ -279,7 +321,8 @@ Page({
     if(scenicPlace.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
       scenicPlaceImageCount++;
       if(scenicPlaceImageCount==scenicPlaceLength){
-        scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+        //scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+        scenicPlace.selectBusStopList();
       }
     }
     else{
@@ -290,7 +333,8 @@ Page({
           scenicPlaceItem.imageSrc=res.path;
           scenicPlaceImageCount++;
           if(scenicPlaceImageCount==scenicPlaceLength){
-            scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+            //scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
+            scenicPlace.selectBusStopList();
           }
         },
         fail: function(res){
@@ -315,6 +359,7 @@ Page({
     }
     else{
       sceDisCanvas = wx.createCanvasContext('sceDisCanvas')
+      console.log("sceDisCanvas="+sceDisCanvas)
       scenicPlace.setData({sceDisCanvas:sceDisCanvas});
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
@@ -347,6 +392,37 @@ Page({
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
     let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
+      //scenicPlace.drawMeLocation();
+      canvasBusStopCount=0;
+      for(var i=0;i<busStopList.length;i++){
+        let busStopItem=busStopList[i];
+        scenicPlace.drawBusStop(busStopItem.name,busStopItem.x,busStopItem.y);
+      }
+    }
+  },
+  drawBusStop:function(name,x,y){
+    canvasBusStopCount++;
+    console.log("canvasBusStopCount==="+canvasBusStopCount)
+    let sceDisCanvas=scenicPlace.data.sceDisCanvas;
+    let sceDisCanvasStyleWidth=scenicPlace.data.sceDisCanvasStyleWidth;
+    let sceDisCanvasStyleHeight=scenicPlace.data.sceDisCanvasStyleHeight;
+    let sceDisCanvasMinWidth=scenicPlace.data.sceDisCanvasMinWidth;
+    let sceDisCanvasMinHeight=scenicPlace.data.sceDisCanvasMinHeight;
+    let widthScale=sceDisCanvasStyleWidth/sceDisCanvasMinWidth;
+    let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
+    //h5页面随着地图放大，坐标自动跟着改变。小程序端不一样，必须根据比例重新计算出坐标位置
+    //h5页面绘制图片是以图片中心点为原点，小程序是以图片左下角为原点。若要做到和h5页面一样，需要用坐标减去图片宽度或高度的一半
+    sceDisCanvas.drawImage(busStopPicUrl, x*widthScale-busStopPicWidth/2, sceDisCanvasStyleHeight-y*heightScale-busStopPicHeight/2, busStopPicWidth, busStopPicHeight);
+
+    sceDisCanvas.font = 'normal bold 10px sans-serif';
+    sceDisCanvas.setTextAlign('center'); // 文字居中
+    sceDisCanvas.setFillStyle("#222");
+    //小程序绘制文字默认以文字中心为原点，而h5页面是以文字左下角为原点。这里不用重新计算
+    sceDisCanvas.fillText(name, x*widthScale,sceDisCanvasStyleHeight-y*heightScale+busStopPicHeight)
+
+    //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
+    let busStopLength=getApp().busStopLength;
+    if(canvasBusStopCount==busStopLength){
       scenicPlace.drawMeLocation();
     }
   },
@@ -470,7 +546,7 @@ Page({
           scenicPlace.initRoadStageNavList(data.roadStageList);
         }
         scenicPlace.setData({navFlag:true});
-        scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,true);
+        scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
       }
     })
   },
