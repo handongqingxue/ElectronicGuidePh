@@ -10,3 +10,17 @@
 	<cover-view class="but_cv big_but_cv" data-bigflag="{{true}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">+</cover-view>
 	<cover-view class="but_cv small_but_cv" data-bigflag="{{false}}" data-resetflag="{{false}}" catchtap="changeCanvasSize">-</cover-view>
 </cover-view>
+<cover-view class="bxcc_cv">
+  <cover-image class="bxccButBg_ci" src="/images/001.png"></cover-image>
+  <cover-view class="bxcc_but_cv">
+    <cover-view class="lr_but_cv bx_but_cv" data-navtype="walk" catchtap="chooseNavType">
+      <cover-image src="/images/002.png"></cover-image>
+      <cover-view>步行</cover-view>
+    </cover-view>
+    <cover-image class="lx_but_ci" src="/images/003.png"></cover-image>
+    <cover-view class="lr_but_cv cc_but_cv" data-navtype="bus" catchtap="chooseNavType">
+      <cover-image src="/images/004.png"></cover-image>
+      <cover-view>乘车</cover-view>
+    </cover-view>
+  </cover-view>
+</cover-view>

@@ -446,14 +446,16 @@ Page({
       if(x>=startX&x<=endX&y>=startY&y<=endY){
         console.log(scenicPlace.name+",x="+scenicPlace.x+",y="+scenicPlace.y);
         //allScenicPlace.navToDestination(scenicPlace.x,scenicPlace.y);
-        allScenicPlace.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight,scenicPlace.arroundScope);
+        if(allScenicPlace.checkNavType()){
+          allScenicPlace.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight,scenicPlace.arroundScope);
+        }
       }
     }
   },
   goScenicPlace:function(id,name,x,y,picUrl,picWidth,picHeight,arroundScope){
     //console.log(picUrl+","+x+","+y+","+picWidth)
     wx.redirectTo({
-      url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight+"&arroundScope="+arroundScope,
+      url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight+"&arroundScope="+arroundScope+"&navType="+allScenicPlace.data.navType,
     })
   },
   navToDestination:function(scenicPlaceX,scenicPlaceY){
@@ -509,6 +511,20 @@ Page({
     let heightScale=sceDisCanvasStyleHeight/sceDisCanvasMinHeight;
     sceDisCanvas.moveTo(x1*widthScale,sceDisCanvasStyleHeight-y1*heightScale) //描述路径的起点为手指触摸的x轴和y轴
     sceDisCanvas.lineTo(x2*widthScale,sceDisCanvasStyleHeight-y2*heightScale) //绘制一条直线，终点坐标为手指触摸结束后的x轴和y轴
+  },
+  checkNavType:function(){
+    let navType=allScenicPlace.data.navType;
+    if(navType==undefined){
+      getApp().showToast("请选择步行或乘车");
+      return false;
+    }
+    else{
+      return true;
+    }
+  },
+  chooseNavType:function(e){
+    let navType=allScenicPlace.data.navType;
+    allScenicPlace.setData({navType:e.currentTarget.dataset.navtype});
   },
 
   /**

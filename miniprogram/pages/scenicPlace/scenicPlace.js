@@ -46,12 +46,13 @@ Page({
 
     options.id=3;
     options.name="岳家庄";
-    options.x=300;
-    options.y=300;
+    options.x=950;
+    options.y=578;
     options.picUrl="/ElectronicGuide/upload/ScenicPlacePic/1628583735118.png";
     options.picWidth=30;
     options.picHeight=30;
     options.arroundScope=30;
+    options.navType="walk";
 
     scenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
@@ -59,7 +60,7 @@ Page({
     busStopPicUrl=getApp().getBusStopPicUrl();
     busStopPicWidth=getApp().getBusStopPicWidth();
     busStopPicHeight=getApp().getBusStopPicHeight();
-    scenicPlace.setData({id:options.id,name:options.name,x:options.x,y:options.y,picUrl:options.picUrl,picWidth:options.picWidth,picHeight:options.picHeight,arroundScope:options.arroundScope});
+    scenicPlace.setData({id:options.id,name:options.name,x:options.x,y:options.y,picUrl:options.picUrl,picWidth:options.picWidth,picHeight:options.picHeight,arroundScope:options.arroundScope,navType:options.navType});
     scenicPlace.getWindowSize();
   },
   getWindowSize:function(){
@@ -629,7 +630,7 @@ Page({
       //if(i==4)
         //break;
       //console.log("==="+JSON.stringify(roadStageList[i]))
-      //console.log("x1="+roadStageList[i].backX+",y1="+roadStageList[i].backY+",x2="+roadStageList[i].frontX+",y2="+roadStageList[i].frontY)
+      console.log("x1="+roadStageNavList[i].backX+",y1="+roadStageNavList[i].backY+",x2="+roadStageNavList[i].frontX+",y2="+roadStageNavList[i].frontY)
       scenicPlace.setRoadStageLocation(sceDisCanvas,roadStageNavList[i].backX,roadStageNavList[i].backY,roadStageNavList[i].frontX,roadStageNavList[i].frontY);
     }
     //scenicPlace.setRoadStageLocation(sceDisCanvas,1097.00,572.00,1181.00,533);
