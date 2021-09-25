@@ -46,13 +46,14 @@ Page({
 
     options.id=3;
     options.name="岳家庄";
-    options.x=950;
-    options.y=578;
+    options.x=700;
+    options.y=450;
     options.picUrl="/ElectronicGuide/upload/ScenicPlacePic/1628583735118.png";
     options.picWidth=30;
     options.picHeight=30;
     options.arroundScope=30;
-    options.navType="walk";
+    //options.navType="walk";
+    options.navType="bus";
 
     scenicPlace=this;
     serverPathCQ=getApp().getServerPathCQ();
@@ -266,8 +267,8 @@ Page({
     scenicPlace.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);
     scenicPlace.selectRoadStageList();
 
-    scenicPlace.setData({meX:1250,meY:580});
-    //scenicPlace.setData({meX:1154,meY:580});
+    //scenicPlace.setData({meX:1250,meY:580});
+    scenicPlace.setData({meX:190,meY:270});
   },
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
@@ -304,7 +305,8 @@ Page({
     }
   },
   checkSceDisImage:function(){
-    if(scenicPlace.data.sceDisCanvasImagePath===undefined){
+    if(getApp().sceDisCanvasImagePath===undefined){
+      console.log("ppppp")
       return false;
     }
     else{
@@ -360,7 +362,7 @@ Page({
     }
     else{
       sceDisCanvas = wx.createCanvasContext('sceDisCanvas')
-      console.log("sceDisCanvas="+sceDisCanvas)
+      //console.log("sceDisCanvas="+sceDisCanvas)
       scenicPlace.setData({sceDisCanvas:sceDisCanvas});
     }
     sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
@@ -403,7 +405,7 @@ Page({
   },
   drawBusStop:function(name,x,y){
     canvasBusStopCount++;
-    console.log("canvasBusStopCount==="+canvasBusStopCount)
+    //console.log("canvasBusStopCount==="+canvasBusStopCount)
     let sceDisCanvas=scenicPlace.data.sceDisCanvas;
     let sceDisCanvasStyleWidth=scenicPlace.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicPlace.data.sceDisCanvasStyleHeight;
@@ -534,17 +536,18 @@ Page({
     */
     wx.request({
       url:serverPathSD+"wechatApplet/navToDestination",
-      data:{meX:meX,meY:meY,scenicPlaceX:scenicPlace.data.x,scenicPlaceY:scenicPlace.data.y},
+      data:{meX:meX,meY:meY,scenicPlaceX:scenicPlace.data.x,scenicPlaceY:scenicPlace.data.y,navType:scenicPlace.data.navType},
       method: 'POST',
       header: {
         'content-type': 'application/x-www-form-urlencoded',
       },
       success: function (res) {
         let data=res.data;
-        console.log("roadStageList==="+data.roadStageList);
+        //console.log("roadStageList==="+data.roadStageList);
         if(data.roadStageList!=null){
           console.log("重新加载导航线...")
           scenicPlace.initRoadStageNavList(data.roadStageList);
+          scenicPlace.setData({endPlace:data.endPlace});
         }
         scenicPlace.setData({navFlag:true});
         scenicPlace.initSceDisCanvas(sceDisCanvasImagePath,false);
@@ -630,7 +633,7 @@ Page({
       //if(i==4)
         //break;
       //console.log("==="+JSON.stringify(roadStageList[i]))
-      console.log("x1="+roadStageNavList[i].backX+",y1="+roadStageNavList[i].backY+",x2="+roadStageNavList[i].frontX+",y2="+roadStageNavList[i].frontY)
+      //console.log("x1="+roadStageNavList[i].backX+",y1="+roadStageNavList[i].backY+",x2="+roadStageNavList[i].frontX+",y2="+roadStageNavList[i].frontY)
       scenicPlace.setRoadStageLocation(sceDisCanvas,roadStageNavList[i].backX,roadStageNavList[i].backY,roadStageNavList[i].frontX,roadStageNavList[i].frontY);
     }
     //scenicPlace.setRoadStageLocation(sceDisCanvas,1097.00,572.00,1181.00,533);
@@ -640,10 +643,10 @@ Page({
     if(!updateFlag){
       clearInterval(updateNavLineInterval);
       updateNavLineInterval=setInterval(() => {
-        if(scenicPlace.checkLocaltionChanged()){
+        scenicPlace.changeMeLocation();
+        if(scenicPlace.checkLocaltionChanged()){//在游客位置改变的情况下才能重绘导航
           //scenicPlace.drawNavRoadLine(true);
           if(scenicPlace.checkSceDisImage()){
-            scenicPlace.changeMeLocation();
             scenicPlace.initMinDistanceStage();
             let nearX=scenicPlace.data.nearX;
             let nearY=scenicPlace.data.nearY;
@@ -670,7 +673,7 @@ Page({
     let preMeY=scenicPlace.data.preMeY;
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
-    //console.log("preMeX="+preMeX+",preMeY="+preMeY+",meX="+meX+",meY="+meY)
+    console.log("preMeX="+preMeX+",preMeY="+preMeY+",meX="+meX+",meY="+meY)
     if(preMeX==meX&preMeY==meY){
       return false;
     }
@@ -681,7 +684,7 @@ Page({
   checkNearScenicPlace:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
-    let scenicPlaceList=scenicPlace.data.scenicPlaceList;
+    let scenicPlaceList=getApp().scenicPlaceList;
     if(detailAudioStateFlag=="pause"||detailAudioStateFlag=="end"){
       for(var i=0;i<scenicPlaceList.length;i++){
         var scenicPlaceItem=scenicPlaceList[i];
@@ -741,17 +744,17 @@ Page({
   changeMeLocation:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
+    console.log("changeMeLocation:preMeX="+meX+",preMeY="+meY);
+    scenicPlace.setData({preMeX:meX,preMeY:meY});
+    meX+=3;
+    meY+=3;
     /*
-    meX-=3;
-    meY-=3;
     if(meX<=1166)
       meX+=3;
     if(meY<=496)
       meY+=3;
       */
-    console.log("changeMeLocation:preMeX="+meX+",preMeY="+meY);
-    scenicPlace.setData({preMeX:meX,preMeY:meY});
-    //scenicPlace.setData({meX:meX,meY:meY});
+    scenicPlace.setData({meX:meX,meY:meY});
   },
   setRoadStageLocation:function(sceDisCanvas,x1,y1,x2,y2){
     let sceDisCanvasStyleWidth=scenicPlace.data.sceDisCanvasStyleWidth;
@@ -777,12 +780,25 @@ Page({
   checkIfInArroundScope:function(){
     let meX=scenicPlace.data.meX;
     let meY=scenicPlace.data.meY;
-    let x=scenicPlace.data.x;
-    let y=scenicPlace.data.y;
+    let x;
+    let y;
+    let arroundScope;
+    let navType=scenicPlace.data.navType;
+    if(navType=="walk"){
+      x=scenicPlace.data.x;
+      y=scenicPlace.data.y;
+      arroundScope=scenicPlace.data.arroundScope;
+    }
+    else if(navType=="bus"){
+      x=scenicPlace.data.endPlace.x;
+      y=scenicPlace.data.endPlace.y;
+      arroundScope=scenicPlace.data.endPlace.arroundScope;
+    }
     let chaX=Math.abs(meX-x);
     let chaY=Math.abs(meY-y);
     let distance=Math.sqrt(chaX*chaX+chaY*chaY);
-    if(distance<=scenicPlace.data.arroundScope){
+    console.log("distance="+distance)
+    if(distance<=arroundScope){
       console.log("已到景点范围内...");
       clearInterval(updateNavLineInterval);
       scenicPlace.setData({arrivedFlag:true});
