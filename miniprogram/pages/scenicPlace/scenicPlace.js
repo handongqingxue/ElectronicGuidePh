@@ -46,8 +46,8 @@ Page({
 
     options.id=3;
     options.name="岳家庄";
-    options.x=700;
-    options.y=450;
+    options.x=616;
+    options.y=293;
     options.picUrl="/ElectronicGuide/upload/ScenicPlacePic/1628583735118.png";
     options.picWidth=30;
     options.picHeight=30;
@@ -268,7 +268,7 @@ Page({
     scenicPlace.selectRoadStageList();
 
     //scenicPlace.setData({meX:1250,meY:580});
-    scenicPlace.setData({meX:190,meY:270});
+    scenicPlace.setData({meX:102,meY:326});
   },
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
@@ -643,7 +643,7 @@ Page({
     if(!updateFlag){
       clearInterval(updateNavLineInterval);
       updateNavLineInterval=setInterval(() => {
-        scenicPlace.changeMeLocation();
+        //scenicPlace.changeMeLocation();
         if(scenicPlace.checkLocaltionChanged()){//在游客位置改变的情况下才能重绘导航
           //scenicPlace.drawNavRoadLine(true);
           if(scenicPlace.checkSceDisImage()){

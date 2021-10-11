@@ -371,7 +371,7 @@ Page({
   },
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     canvasScenicPlaceCount++;
-    console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
+    //console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     let sceDisCanvasStyleWidth=scenicDistrict.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
@@ -401,7 +401,7 @@ Page({
   },
   drawBusStop:function(name,x,y){
     canvasBusStopCount++;
-    console.log("canvasBusStopCount==="+canvasBusStopCount)
+    //console.log("canvasBusStopCount==="+canvasBusStopCount)
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     let sceDisCanvasStyleWidth=scenicDistrict.data.sceDisCanvasStyleWidth;
     let sceDisCanvasStyleHeight=scenicDistrict.data.sceDisCanvasStyleHeight;
