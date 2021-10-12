@@ -63,29 +63,6 @@ Page({
       //https://developers.weixin.qq.com/miniprogram/dev/component/canvas.html#Canvas-2D-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81
       //https://www.jb51.net/article/182288.htm
       scenicDistrict.selectSceDisById();
-      //scenicDistrict.initSceDisCanvas("http://tmp/VEVKyulCFuto9c4f4458d9905c2fa99bb56eb28a6276.jpg",false);
-      /*
-      var ctx = wx.createCanvasContext('sceDisCanvas')
-      //ctx.drawImage("/images/database.png", 0, 0, 1550, 1200);
-      wx.getImageInfo({
-        src: 'http://www.qrcodesy.com:8080/ElectronicGuide/upload/map/1626254021278.jpg',
-        success: function (res){
-          console.log("res==="+JSON.stringify(res));
-          ctx.drawImage(res.path, 0, 0, 1550, 1200);
-
-          var str = "我都不惜说你了"
-          ctx.font = 'normal bold 20px sans-serif';
-          ctx.setTextAlign('center'); // 文字居中
-          ctx.setFillStyle("#222222");
-          ctx.fillText(str, 100,65)
-    
-          
-          ctx.drawImage("/images/deploy_step1.png", 100, 100, 550, 200);
-    
-          ctx.draw();
-        }
-      })
-      */
   },
 
   /**
@@ -129,6 +106,7 @@ Page({
   onShareAppMessage: function () {
 
   },
+  //验证景区信息是否已加载
   checkSceDisInfo:function(){
     let sceDis=getApp().sceDis;
     if(sceDis==undefined)
@@ -136,6 +114,7 @@ Page({
     else
       return true;
   },
+  //根据id查询景区信息
   selectSceDisById:function(){
     if(scenicDistrict.checkSceDisInfo()){
       console.log("景区信息已下载");
@@ -158,7 +137,7 @@ Page({
           var status = res.data.status;
           if (status == "ok") {
             let sceDis=data.sceDis;
-            getApp().sceDis=sceDis;
+            getApp().sceDis=sceDis;//把景区信息存到全局变量里
             scenicDistrict.initSceDisInfo(sceDis);
           }
         },
@@ -183,12 +162,13 @@ Page({
       sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
       sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
     });
-    serverPathSD="http://"+sceDis.serverName+":8080/ElectronicGuideSD/";
+    serverPathSD=serverPath+"/ElectronicGuideSD/";
     
-    scenicDistrict.jiSuanLocationScale(sceDis);
+    scenicDistrict.jiSuanLocationScale(sceDis);//计算位置比例
     //scenicDistrict.downloadFile(serverPath+data.sceDis.mapUrl);
-    scenicDistrict.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);
+    scenicDistrict.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);//初始化景区地图
   },
+  //计算位置比例
   jiSuanLocationScale:function(sceDis){
     let locationWidthScale=(sceDis.longitudeEnd-sceDis.longitudeStart)/sceDis.mapWidth;
     let locationHeightScale=(sceDis.latitudeEnd-sceDis.latitudeStart)/sceDis.mapHeight;
@@ -206,6 +186,7 @@ Page({
       }
     });
   },
+  //验证景区地图是否已下载
   checkSceDisCanvasImagePath:function(){
     let sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
     if(sceDisCanvasImagePath==undefined)
@@ -215,11 +196,10 @@ Page({
   },
   initSceDisCanvasImagePath:function(src){
     //console.log("src="+src)
-    //console.log("serverPathSD="+serverPathSD);
     if(scenicDistrict.checkSceDisCanvasImagePath()){
       console.log("景区地图已下载");
-      sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;
-      scenicDistrict.selectScenicPlaceList();
+      sceDisCanvasImagePath=getApp().sceDisCanvasImagePath;//直接从全局变量里读取景区地图
+      scenicDistrict.selectScenicPlaceList();//加载景区里的景点
     }
     else{
       console.log("重新下载景区地图");
@@ -236,21 +216,23 @@ Page({
       })
     }
   },
+  //验证单个景点图片
   checkScenicPlaceImageSrc:function(imageSrc){
     if(imageSrc==undefined)
       return false;
     else
       return true;
   },
+  //初始化单个景点图片
   initScenicPlaceImageSrc:function(scenicPlaceItem){
     let scenicPlaceLength=getApp().scenicPlaceLength;
-    if(scenicDistrict.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){
-      scenicPlaceImageCount++;
-      if(scenicPlaceImageCount==scenicPlaceLength){
+    if(scenicDistrict.checkScenicPlaceImageSrc(scenicPlaceItem.imageSrc)){//小程序显示网络图片与h5端不同，需要转换为本地缓存图片。若缓存图片存在则不需要重新转换
+      scenicPlaceImageCount++;//每加载完一张图片，数量就加1
+      if(scenicPlaceImageCount==scenicPlaceLength){//待加载完所有景点图片，下一步就开始加载站点列表
         scenicDistrict.selectBusStopList();
       }
     }
-    else{
+    else{//若本地缓存图片不存在，则需要重新转换
       wx.getImageInfo({
         src: serverPath+scenicPlaceItem.picUrl,
         success: function (res){
@@ -285,14 +267,15 @@ Page({
       sceDisCanvas = wx.createCanvasContext('sceDisCanvas')
       scenicDistrict.setData({sceDisCanvas:sceDisCanvas});
     }
-    sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);
+    sceDisCanvas.drawImage(path, sceDisCanvasImageX, sceDisCanvasImageY, sceDisCanvasStyleWidth, sceDisCanvasStyleHeight);//先绘景区地图
 
-    canvasScenicPlaceCount=0;
+    canvasScenicPlaceCount=0;//把景点数量归0，根据已加载好的景点列表数据重新绘制景点
     for(var i=0;i<scenicPlaceList.length;i++){
       let scenicPlaceItem=scenicPlaceList[i];
       scenicDistrict.drawScenicPlace(scenicPlaceItem.name,scenicPlaceItem.imageSrc,scenicPlaceItem.x,scenicPlaceItem.y,scenicPlaceItem.picWidth,scenicPlaceItem.picHeight);
     }
   },
+  //验证景点列表是否已加载
   checkScenicPlaceList:function(){
     let scenicPlaceList=getApp().scenicPlaceList;
     if(scenicPlaceList==undefined)
@@ -300,10 +283,11 @@ Page({
     else
       return true;
   },
+  //加载景点列表
   selectScenicPlaceList:function(){
     if(scenicDistrict.checkScenicPlaceList()){
       console.log("景点列表已下载");
-      scenicPlaceList=getApp().scenicPlaceList;
+      scenicPlaceList=getApp().scenicPlaceList;//若景点列表已下载，直接从全局变量里读取
       scenicDistrict.initScenicPlaceList(scenicPlaceList);
     }
     else{
@@ -317,7 +301,7 @@ Page({
         success: function (res) {
           let data=res.data;
           scenicPlaceList=data.scenicPlaceList;
-          getApp().scenicPlaceList=scenicPlaceList;
+          getApp().scenicPlaceList=scenicPlaceList;//加载完把景点列表存在全局变量里
           getApp().scenicPlaceLength=scenicPlaceList.length;
           scenicDistrict.initScenicPlaceList(scenicPlaceList);
         },
@@ -327,6 +311,7 @@ Page({
       })
     }
   },
+  //初始化景点列表
   initScenicPlaceList:function(scenicPlaceList){
     scenicPlaceImageCount=0;
     canvasScenicPlaceCount=0;
@@ -335,6 +320,7 @@ Page({
         scenicDistrict.initScenicPlaceImageSrc(scenicPlaceList[i]);
     }
   },
+  //验证站点列表是否已下载
   checkBusStopList:function(){
     let busStopList=getApp().busStopList;
     if(busStopList==undefined)
@@ -345,10 +331,10 @@ Page({
   selectBusStopList:function(){
     if(scenicDistrict.checkBusStopList()){
       console.log("站点列表已下载");
-      busStopList=getApp().busStopList;
+      busStopList=getApp().busStopList;//若已下载，直接从全局变量里读取
       scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
     }
-    else{
+    else{//若未下载，重新调用接口加载站点列表
       console.log("重新下载站点列表");
       wx.request({
         url:serverPathSD+"wechatApplet/selectBusStopList",
@@ -359,9 +345,9 @@ Page({
         success: function (res) {
           let data=res.data;
           busStopList=data.busStopList;
-          getApp().busStopList=busStopList;
+          getApp().busStopList=busStopList;//加载完成后，存在全局变量里
           getApp().busStopLength=busStopList.length;
-          scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);
+          scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,false);//加载完站点列表，再初始化景区地图
         },
         fail:function(){
           
@@ -369,6 +355,7 @@ Page({
       })
     }
   },
+  //绘制每个景点
   drawScenicPlace:function(name,picUrl,x,y,picWidth,picHeight){
     canvasScenicPlaceCount++;
     //console.log("canvasScenicPlaceCount==="+canvasScenicPlaceCount)
@@ -392,13 +379,14 @@ Page({
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
     let scenicPlaceLength=getApp().scenicPlaceLength;
     if(canvasScenicPlaceCount==scenicPlaceLength){
-      canvasBusStopCount=0;
+      canvasBusStopCount=0;//绘制完所有景点，再把站点数量归0，重新绘制站点
       for(var i=0;i<busStopList.length;i++){
         let busStopItem=busStopList[i];
         scenicDistrict.drawBusStop(busStopItem.name,busStopItem.x,busStopItem.y);
       }
     }
   },
+  //绘制每个站点
   drawBusStop:function(name,x,y){
     canvasBusStopCount++;
     //console.log("canvasBusStopCount==="+canvasBusStopCount)
@@ -421,7 +409,7 @@ Page({
 
     //当地图上所有景点图片都加载完后再绘制，以防出现未加载完的图片不显示现象
     let busStopLength=getApp().busStopLength;
-    if(canvasBusStopCount==busStopLength){
+    if(canvasBusStopCount==busStopLength){//绘制完所有站点，再绘制游客的位置点
       scenicDistrict.drawMeLocation();
     }
   },
@@ -440,12 +428,14 @@ Page({
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     sceDisCanvas.drawImage("/images/meLocation.jpg", x*widthScale-picWidth/2, sceDisCanvasStyleHeight-y*heightScale-picHeight/2, picWidth, picHeight);
     
-    scenicDistrict.drawSceDisCanvas();
+    scenicDistrict.drawSceDisCanvas();//待地图上所有景物都绘制完后，把整个地图绘制显示出来
   },
+  //绘制整个地图
   drawSceDisCanvas:function(){
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     sceDisCanvas.draw();
   },
+  //改变景区地图尺寸
   changeCanvasSize:function(e){
     let bigflag=e.currentTarget.dataset.bigflag;
     let resetflag=e.currentTarget.dataset.resetflag;
@@ -489,12 +479,14 @@ Page({
     })
     scenicDistrict.initSceDisCanvas(sceDisCanvasImagePath,true);
   },
+  //清除景区地图
   clearSceDisCanvas:function(){
     let sceDis=scenicDistrict.data.sceDis;
     let sceDisCanvas=scenicDistrict.data.sceDisCanvas;
     sceDisCanvas.clearRect(0, 0, sceDis.mapWidth, sceDis.mapHeight);
     sceDisCanvas.draw(true);
   },
+  //获取点击的地图位置
   getTouchPoint:function(e){
     let pageX=e.touches[0].pageX;
     let pageY=e.touches[0].pageY;
@@ -517,6 +509,7 @@ Page({
       let endY=scenicPlace.y+scenicPlace.picHeight/2;
       if(x>=startX&x<=endX&y>=startY&y<=endY){
         //console.log("id="+scenicPlace.id+","+scenicPlace.name+",x="+scenicPlace.x+",y="+scenicPlace.y);
+        //若点击的是景点位置，就跳转到该景点信息页面
         scenicDistrict.goScenicPlace(scenicPlace.id,scenicPlace.name,scenicPlace.x,scenicPlace.y,scenicPlace.picUrl,scenicPlace.picWidth,scenicPlace.picHeight,scenicPlace.arroundScope);
       }
     }
@@ -526,9 +519,11 @@ Page({
       url: '/pages/scenicPlace/scenicPlace?id='+id+"&name="+name+"&x="+x+"&y="+y+"&picUrl="+picUrl+"&picWidth="+picWidth+"&picHeight="+picHeight+"&arroundScope="+arroundScope,
     })
   },
+  //滚动地图监听
   scrollCanvas:function(e){
     scenicDistrict.setData({sceDisCanvasScrollLeft:e.detail.scrollLeft,sceDisCanvasScrollTop:e.detail.scrollTop});
   },
+  //跳转到所有景点页面
   goAllScenicPlace:function(){
     wx.redirectTo({
       url: '/pages/allScenicPlace/allScenicPlace',
