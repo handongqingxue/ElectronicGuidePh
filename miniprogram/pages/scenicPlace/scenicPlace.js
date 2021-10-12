@@ -261,8 +261,7 @@ Page({
       sceDisCanvasMaxWidth:sceDisCanvasMaxWidth,
       sceDisCanvasMaxHeight:sceDisCanvasMaxHeight
     });
-    //serverPathSD="https://"+sceDis.serverName+"/ElectronicGuideSD/";
-    serverPathSD="http://"+sceDis.serverName+":8080/ElectronicGuideSD/";
+    serverPathSD=serverPath+"/ElectronicGuideSD/";
     scenicPlace.jiSuanLocationScale(sceDis);
     scenicPlace.initSceDisCanvasImagePath(serverPath+sceDis.mapUrl);
     scenicPlace.selectRoadStageList();
